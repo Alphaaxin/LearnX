@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - LearnX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .gradient-bg {
+      background: linear-gradient(135deg, #1E201E, #3C3D37, #697565);
+    }
+
+    body {
+        background: linear-gradient(135deg, #1E201E, #3C3D37, #697565);
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .card {
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      border-color: rgba(0, 191, 166, 0.2);
+    }
+    .sidebar-link {
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+      padding-left: 10px;
+    }
+    .sidebar-link:hover, .sidebar-link.active {
+      border-left-color: #00bfa6;
+      background-color: rgba(0, 191, 166, 0.1);
+    }
+    .skill-badge {
+      background: linear-gradient(135deg, rgba(0, 191, 166, 0.2) 0%, rgba(0, 165, 144, 0.2) 100%);
+      transition: all 0.2s ease;
+    }
+    .skill-badge:hover {
+      background: linear-gradient(135deg, rgba(0, 191, 166, 0.3) 0%, rgba(0, 165, 144, 0.3) 100%);
+    }
+    .profile-tab {
+      transition: all 0.3s ease;
+    }
+    .profile-tab.active {
+      border-bottom: 3px solid var(--primary);
+      color: var(--primary);
+    }
+    .profile-tab:not(.active):hover {
+      border-bottom: 3px solid rgba(0, 191, 166, 0.3);
+    }
+    .action-btn {
+      transition: all 0.3s ease;
+    }
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 191, 166, 0.3);
+    }
+    
+    /* Modal styles */
+    #edit-profile-modal {
+      overflow-y: auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 0;
+    }
+    
+    #edit-profile-modal.hidden {
+      display: none !important;
+    }
+    
+    #edit-profile-modal .bg-surface-1 {
+      margin: auto;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    
+    /* For small screens - take more space */
+    @media (max-width: 640px) {
+      #edit-profile-modal .bg-surface-1 {
+        max-width: 95%;
+        max-height: 90vh;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+  <div id="particles-js" class="absolute top-0 left-0 w-full h-full z-10 opacity-30 pointer-events-none"></div>
+<body class="gradient-bg text-white font-sans">
+
+  <div class="flex">
+    <!-- Sidebar Placeholder - will be replaced by sidebar-loader.js -->
+    <div class="sidebar-placeholder"></div>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-64 p-8">
+      <!-- Header with Tabs -->
+      <div class="flex flex-col md:flex-row md:justify-between md:items-end mb-8 border-b border-gray-800 pb-4">
+        <h1 class="text-3xl font-bold mb-4 md:mb-0" data-aos="fade-right">My Profile</h1>
+        <div class="flex space-x-6">
+          <button class="profile-tab active pb-2 px-1 font-medium" data-tab="profile">Profile</button>
+          <button class="profile-tab pb-2 px-1 font-medium" data-tab="portfolio">Portfolio</button>
+          <button class="profile-tab pb-2 px-1 font-medium" data-tab="stats">Statistics</button>
+          <button class="profile-tab pb-2 px-1 font-medium" data-tab="settings">Settings</button>
+        </div>
+      </div>
+
+      <!-- Profile Header Section -->
+      <div class="relative mb-8" data-aos="fade-up">
+        <!-- Cover Photo -->
+        <div class="h-48 bg-gradient-to-r from-surface-1 to-surface-3 rounded-t-xl overflow-hidden">
+          <div class="absolute top-2 right-4">
+            <button class="bg-surface-1 bg-opacity-50 text-white p-2 rounded-lg hover:bg-opacity-70 transition-colors">
+              <i class="fas fa-camera"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Profile Info -->
+        <div class="card bg-surface-1 rounded-b-xl p-6 pb-8 relative">
+          <div class="absolute -top-16 left-8">
+            <div class="relative">
+              <img id="profile-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzAwQkZBNiIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjQwIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5VPC90ZXh0Pjwvc3ZnPg==" alt="User" class="w-32 h-32 rounded-full border-4 border-surface-1 object-cover" 
+                   onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzAwQkZBNiIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjQwIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5VPC90ZXh0Pjwvc3ZnPg=='; console.log('Profile image error, using fallback');">
+              <button class="absolute bottom-1 right-1 bg-primary text-white p-2 rounded-full hover:bg-primary-dark transition-colors">
+                <i class="fas fa-camera"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="ml-44 flex flex-col md:flex-row md:justify-between">
+            <div>
+              <h2 id="username" class="text-2xl font-bold">John Doe</h2>
+              <p id="bio-short" class="text-secondary">Web Developer | JavaScript Expert</p>
+              <div class="flex items-center mt-2">
+                <div class="flex text-warning mr-2">
+                  <i class="fas fa-star"></i>
+                  <span id="rating-value" class="ml-1">4.5</span>
+                </div>
+                <span id="rating-count" class="text-secondary text-sm">(15 reviews)</span>
+              </div>
+            </div>
+            <div class="flex mt-4 md:mt-0">
+              <button id="edit-profile-btn" class="btn btn-primary py-2 px-6 rounded-lg flex items-center">
+                <i class="fas fa-edit mr-2"></i> Edit Profile
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Sections -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left Column (2/3 width on large screens) -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- About Section -->
+          <div class="card bg-surface-1 p-6 rounded-xl shadow-lg" data-aos="fade-up">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-bold">About Me</h3>
+              <button class="text-primary hover:text-primary-dark transition-colors">
+                <i class="fas fa-edit"></i>
+              </button>
+            </div>
+            <p id="bio-text" class="text-secondary leading-relaxed">
+              A passionate developer specializing in web technologies. I love to build applications and solve real-world problems.
+            </p>
+          </div>
+
+          <!-- Skills Section -->
+          <div class="card bg-surface-1 p-6 rounded-xl shadow-lg skills-section" data-aos="fade-up" data-aos-delay="100">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-bold">Skills</h3>
+              <button class="text-primary hover:text-primary-dark transition-colors">
+                <i class="fas fa-plus"></i> Add Skill
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-2" id="skills">
+              <!-- Skills will be populated here -->
+            </div>
+          </div>
+
+          <!-- Portfolio Section -->
+          <div class="card bg-surface-1 p-6 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="150">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-bold">Portfolio Highlights</h3>
+              <button class="text-primary hover:text-primary-dark transition-colors">
+                <i class="fas fa-plus"></i> Add Project
+              </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="portfolio">
+              <!-- Portfolio items will be populated here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column (1/3 width on large screens) -->
+        <div class="space-y-6">
+          <!-- Stats Section -->
+          <div class="card bg-surface-1 p-6 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="200">
+            <h3 class="text-xl font-bold mb-4">Stats</h3>
+            <div class="space-y-4">
+              <div>
+                <p class="text-secondary mb-1">Current Rating</p>
+                <div class="flex items-center">
+                  <div class="text-warning text-xl mr-2">★★★★★</div>
+                  <span class="text-lg font-semibold">4.5</span>
+                </div>
+              </div>
+              <div>
+                <p class="text-secondary mb-1">Sessions Completed</p>
+                <p class="text-lg font-semibold">32</p>
+              </div>
+              <div>
+                <p class="text-secondary mb-1">Students Taught</p>
+                <p class="text-lg font-semibold">15</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Availability Section -->
+          <div class="card bg-surface-1 p-6 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="250">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-bold">Availability</h3>
+              <button class="text-primary hover:text-primary-dark transition-colors">
+                <i class="fas fa-edit"></i>
+              </button>
+            </div>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span>Monday</span>
+                <span class="text-primary">9 AM - 5 PM</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>Wednesday</span>
+                <span class="text-primary">10 AM - 6 PM</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>Friday</span>
+                <span class="text-primary">9 AM - 3 PM</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Connect Section -->
+          <div class="card bg-surface-1 p-6 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="300">
+            <h3 class="text-xl font-bold mb-4">Connect</h3>
+            <div class="space-y-3">
+              <a href="#" class="flex items-center text-secondary hover:text-primary transition-colors">
+                <i class="fab fa-linkedin mr-2"></i> LinkedIn
+              </a>
+              <a href="#" class="flex items-center text-secondary hover:text-primary transition-colors">
+                <i class="fab fa-github mr-2"></i> GitHub
+              </a>
+              <a href="#" class="flex items-center text-secondary hover:text-primary transition-colors">
+                <i class="fas fa-globe mr-2"></i> Portfolio Website
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-notification">
+    <div class="flex items-center">
+      <i class="fas fa-info-circle text-primary text-xl mr-3"></i>
+      <div>
+        <h4 class="font-medium">Information</h4>
+        <p class="text-sm text-secondary" id="toast-message">This is a notification.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div id="edit-profile-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden overflow-y-auto py-10">
+    <div class="bg-surface-1 p-6 rounded-xl w-full max-w-2xl max-h-[80vh] overflow-y-auto my-auto relative">
+      <div class="flex justify-between items-center sticky top-0 bg-surface-1 pb-4 border-b border-gray-800 mb-6 z-10">
+        <h3 class="text-2xl font-bold">Edit Profile</h3>
+        <button id="close-modal-btn" type="button" class="text-secondary hover:text-white p-2 cursor-pointer">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      
+      <form id="edit-profile-form" class="space-y-6">
+        <div class="flex items-center mb-4">
+          <img id="edit-profile-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzAwQkZBNiIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjQwIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5VPC90ZXh0Pjwvc3ZnPg==" alt="Profile" class="w-20 h-20 rounded-full mr-4 object-cover border-2 border-primary"
+               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzAwQkZBNiIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjQwIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5VPC90ZXh0Pjwvc3ZnPg=='; console.log('Edit profile image error, using fallback');">
+          <div>
+            <label for="profile-image-upload" class="btn btn-secondary py-2 px-3 rounded-lg cursor-pointer block text-center">
+              <i class="fas fa-camera mr-1"></i> Change Photo
+            </label>
+            <input type="file" id="profile-image-upload" class="hidden" accept="image/*">
+            <p class="text-xs text-secondary mt-1">Recommended: Square JPG, PNG</p>
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-gray-400 mb-2 text-sm font-medium">Bio</label>
+          <textarea id="edit-bio" class="w-full bg-surface-3 p-3 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-primary min-h-[100px]"></textarea>
+          <p class="text-xs text-secondary mt-1">Tell others about yourself, your experience, and interests.</p>
+        </div>
+        
+        <div>
+          <label class="block text-gray-400 mb-2 text-sm font-medium">Headline</label>
+          <input type="text" id="edit-headline" class="w-full bg-surface-3 p-3 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-primary" placeholder="e.g., JavaScript Developer | React Expert">
+        </div>
+        
+        <div>
+          <label class="block text-gray-400 mb-2 text-sm font-medium">Education</label>
+          <input type="text" id="edit-education" class="w-full bg-surface-3 p-3 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-primary" placeholder="e.g., Bachelor's in Computer Science, University Name">
+        </div>
+        
+        <div>
+          <label class="block text-gray-400 mb-2 text-sm font-medium">Experience (years)</label>
+          <input type="text" id="edit-experience" class="w-full bg-surface-3 p-3 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-primary" placeholder="e.g., 5+ years in web development">
+        </div>
+        
+        <div>
+          <label class="block text-gray-400 mb-2 text-sm font-medium">Languages</label>
+          <input type="text" id="edit-languages" class="w-full bg-surface-3 p-3 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-primary" placeholder="e.g., English, Spanish, French">
+        </div>
+        
+        <div>
+          <label class="block text-gray-400 mb-2 text-sm font-medium">Website or Portfolio URL</label>
+          <input type="url" id="edit-website" class="w-full bg-surface-3 p-3 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-primary" placeholder="https://example.com">
+        </div>
+        
+        <div class="flex justify-end pt-4">
+          <button type="button" id="cancel-edit-btn" class="btn btn-secondary py-2 px-6 rounded-lg mr-3">Cancel</button>
+          <button type="submit" class="btn btn-primary py-2 px-6 rounded-lg">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- AOS Animation Init -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="js/sidebar-loader.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+
+    // Generate default SVG avatar with user initials
+    function generateDefaultAvatarSVG(firstName, lastName) {
+      const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : 'U';
+      const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
+      const initials = firstInitial + (lastInitial || '');
+      
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <rect width="100" height="100" fill="#00BFA6"/>
+        <text x="50" y="50" font-family="Arial" font-size="40" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="central">${initials}</text>
+      </svg>`;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      // Get the token from localStorage
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        showToast("You must be logged in to view your profile");
+        setTimeout(() => {
+          window.location.href = 'login.html'; // Redirect to login page
+        }, 2000);
+        return;
+      }
+      
+      // Parse the token to get userId
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        // Fetch user profile data
+        fetchUserProfile();
+        
+        // Set up tab switching
+        const tabs = document.querySelectorAll('.profile-tab');
+        tabs.forEach(tab => {
+          tab.addEventListener('click', function() {
+            // Remove active class from all tabs
+            tabs.forEach(t => t.classList.remove('active'));
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Handle tab content switching
+            const tabName = this.getAttribute('data-tab');
+            console.log(`Switching to ${tabName} tab`);
+            // TODO: Implement tab content switching
+          });
+        });
+        
+        // Add skill button functionality
+        document.querySelector('.skills-section button').addEventListener('click', function() {
+          addNewSkill();
+        });
+      } catch (error) {
+        console.error("Error parsing token:", error);
+        showToast("Authentication error. Please log in again.");
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 2000);
+      }
+    });
+    
+    async function fetchUserProfile() {
+      try {
+        // First check if we have a token
+        const token = localStorage.getItem('token');
+        if (!token) {
+          // No token - redirect to login
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Make API call to fetch user profile
+        const response = await fetch(`http://localhost:5000/api/users/profile`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        // Check if token expired
+        if (response.status === 401) {
+          // Token expired - redirect to login
+          window.location.href = 'login.html';
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch profile data');
+        }
+
+        const data = await response.json();
+        console.log('Profile data:', data);
+
+        // Defensive: check that data and profilePhoto exist
+        let user = (data && typeof data === 'object') ? (data.user || data) : null;
+        if (!user || typeof user !== 'object') {
+          throw new Error('User profile data not found in response');
+        }
+
+        // Optionally log the user object for debugging
+        console.log('User object:', user);
+
+        // Defensive skills parsing
+        let skills = [];
+        if (user.skills) {
+          if (typeof user.skills === 'string') {
+            try { skills = JSON.parse(user.skills); }
+            catch { skills = user.skills.split(','); }
+          } else if (Array.isArray(user.skills)) {
+            skills = user.skills;
+          }
+        }
+
+        // Map all fields once, after parsing
+        const profileData = {
+          username: `${user.firstName || user.name || user.username || ''} ${user.lastName || ''}`.trim(),
+          bio_short: user.headline || (user.isTeacher ? "Teacher" : "Student") + " at LearnX",
+          bio_text: user.bio || "No bio information available. Click 'Edit Profile' to add your bio.",
+          rating: data.reviews && data.reviews.length > 0 ? 
+            data.reviews.reduce((sum, review) => sum + review.rating, 0) / data.reviews.length : 
+            "No ratings yet",
+          review_count: data.reviews ? data.reviews.length : 0,
+          skills: skills,
+          portfolio: data.courses && data.courses.length > 0 ? data.courses.map(course => ({
+            title: course.title,
+            description: course.description,
+            image: course.image_url || "https://placehold.co/300x200"
+          })) : [],
+          profilePhoto: user.profilePhoto || ''
+        };
+
+        // Update profile image handling to work with both URLs and data URLs
+        const profileImgElement = document.getElementById('profile-img');
+        const editProfileImgElement = document.getElementById('edit-profile-img');
+        
+        if (profileData.profilePhoto) {
+          if (profileData.profilePhoto.startsWith('data:image') || profileData.profilePhoto.startsWith('http')) {
+            profileImgElement.src = profileData.profilePhoto;
+            editProfileImgElement.src = profileData.profilePhoto;
+          } else {
+            // Handle server-side profile photos correctly
+            const photoPath = profileData.profilePhoto.startsWith('/uploads/') 
+              ? `http://localhost:5000${profileData.profilePhoto}` 
+              : `http://localhost:5000/uploads/${profileData.profilePhoto}`;
+            
+            // Add error handling for images
+            profileImgElement.src = photoPath;
+            editProfileImgElement.src = photoPath;
+            
+            // Add error handlers
+            profileImgElement.onerror = function() {
+              console.log('Profile image error, using fallback');
+              this.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(profileData.name || 'User');
+            };
+            
+            editProfileImgElement.onerror = function() {
+              console.log('Edit profile image error, using fallback');
+              this.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(profileData.name || 'User');
+            };
+          }
+        } else {
+          const svg = generateDefaultAvatarSVG(user.firstName || user.name || user.username || '', user.lastName || '');
+          const dataUrl = 'data:image/svg+xml;base64,' + btoa(svg);
+          profileImgElement.src = dataUrl;
+          editProfileImgElement.src = dataUrl;
+        }
+
+        // Populate profile data
+        populateProfileData(profileData);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        showToast("Error loading profile data. Please try again.");
+        
+        // Fall back to placeholder data for demonstration
+        const fallbackData = {
+          username: "Profile Data Unavailable",
+          bio_short: "Could not load profile data",
+          bio_text: "There was an error loading your profile data. Please check your connection and try again.",
+          rating: "N/A",
+          review_count: 0,
+          skills: ["Could not load skills"],
+          portfolio: [],
+          profilePhoto: '' // Defensive: ensure this property exists for fallback
+        };
+        populateProfileData(fallbackData);
+      }
+    }
+    
+    function populateProfileData(data) {
+      // Populate basic profile info
+      document.getElementById('username').textContent = data.username;
+      document.getElementById('bio-short').textContent = data.bio_short;
+      document.getElementById('bio-text').textContent = data.bio_text;
+      document.getElementById('rating-value').textContent = data.rating;
+      document.getElementById('rating-count').textContent = `(${data.review_count} reviews)`;
+      
+      // Populate skills
+      const skillsContainer = document.getElementById('skills');
+      skillsContainer.innerHTML = '';
+      
+      if (data.skills && data.skills.length > 0) {
+        data.skills.forEach(skill => {
+          if (skill && skill.trim()) { // Only add non-empty skills
+            const skillBadge = document.createElement('div');
+            skillBadge.className = 'badge-primary py-2 px-4 rounded-full text-sm m-1';
+            skillBadge.textContent = skill;
+            skillsContainer.appendChild(skillBadge);
+          }
+        });
+      } else {
+        const emptySkillsMessage = document.createElement('p');
+        emptySkillsMessage.className = 'text-secondary text-sm italic';
+        emptySkillsMessage.textContent = 'No skills added yet. Click "Add Skill" to add your skills.';
+        skillsContainer.appendChild(emptySkillsMessage);
+      }
+      
+      // Populate portfolio
+      const portfolioContainer = document.getElementById('portfolio');
+      portfolioContainer.innerHTML = '';
+      
+      if (data.portfolio && data.portfolio.length > 0) {
+        data.portfolio.forEach(project => {
+          const projectCard = document.createElement('div');
+          projectCard.className = 'card bg-surface-2 rounded-lg overflow-hidden card-hover';
+          
+          projectCard.innerHTML = `
+            <img src="${project.image}" alt="${project.title}" class="w-full h-32 object-cover">
+            <div class="p-4">
+              <h4 class="font-semibold">${project.title}</h4>
+              <p class="text-sm text-secondary mt-1">${project.description}</p>
+            </div>
+          `;
+          
+          portfolioContainer.appendChild(projectCard);
+        });
+      } else {
+        const emptyPortfolioMessage = document.createElement('p');
+        emptyPortfolioMessage.className = 'text-secondary text-sm italic col-span-2';
+        emptyPortfolioMessage.textContent = 'No portfolio items yet. Add courses or projects to showcase your work.';
+        portfolioContainer.appendChild(emptyPortfolioMessage);
+      }
+    }
+    
+    function addNewSkill() {
+      const newSkill = prompt("Enter a new skill:");
+      if (newSkill && newSkill.trim()) {
+        // Get existing skills
+        const skillsContainer = document.getElementById('skills');
+        const skillBadge = document.createElement('div');
+        skillBadge.className = 'badge-primary py-2 px-4 rounded-full text-sm m-1';
+        skillBadge.textContent = newSkill;
+        
+        // Clear "no skills" message if it exists
+        if (skillsContainer.querySelector('.text-secondary.italic')) {
+          skillsContainer.innerHTML = '';
+        }
+        
+        skillsContainer.appendChild(skillBadge);
+        
+        // Update skills in the database
+        updateUserSkills(newSkill);
+        
+        showToast(`Skill "${newSkill}" added!`);
+      }
+    }
+    
+    async function updateUserSkills(newSkill) {
+      try {
+        // Get all current skills from the UI
+        const skillElements = document.querySelectorAll('#skills .badge-primary');
+        const skills = Array.from(skillElements).map(el => el.textContent.trim());
+        
+        // Make API call to update user profile
+        const response = await fetch(`http://localhost:5000/api/users/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({ skills })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to update skills');
+        }
+        
+        console.log('Skills updated successfully');
+      } catch (error) {
+        console.error('Error updating skills:', error);
+        showToast('Error saving skill. It will appear on the page but may not be saved permanently.');
+      }
+    }
+    
+    // Toast notification function
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Edit Profile Modal Functionality
+    const editProfileBtn = document.getElementById('edit-profile-btn');
+    const editProfileModal = document.getElementById('edit-profile-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    const editProfileForm = document.getElementById('edit-profile-form');
+    const profileImageUpload = document.getElementById('profile-image-upload');
+    const editProfileImg = document.getElementById('edit-profile-img');
+
+    // Improved modal close handling - complete replacement of the close handlers
+    closeModalBtn.onclick = null; // Clear any existing handlers
+    closeModalBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('Close button clicked');
+      hideModal();
+    });
+
+    // Make sure the cancel button closes the modal too
+    cancelEditBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      console.log('Cancel button clicked');
+      hideModal();
+    });
+
+    // Add click handler to background for closing modal when clicking outside
+    editProfileModal.addEventListener('click', function(e) {
+      // Only close if clicking directly on the modal background (not the content)
+      if (e.target === editProfileModal) {
+        hideModal();
+      }
+    });
+    
+    // Helper function to hide the modal
+    function hideModal() {
+      console.log('Hiding modal...');
+      editProfileModal.classList.add('hidden');
+      document.body.style.overflow = 'auto'; // Re-enable scrolling
+    }
+    
+    // Helper function to show the modal
+    function showModal() {
+      editProfileModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden'; // Disable background scrolling
+    }
+    
+    // Show modal - updated to use the helper function
+    editProfileBtn.addEventListener('click', function() {
+      // Populate form with current values
+      document.getElementById('edit-bio').value = document.getElementById('bio-text').textContent.trim();
+      document.getElementById('edit-headline').value = document.getElementById('bio-short').textContent.trim();
+      
+      // Set current profile image
+      editProfileImg.src = document.getElementById('profile-img').src;
+      
+      // Show modal
+      showModal();
+    });
+
+    // Handle profile image upload preview
+    profileImageUpload.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          editProfileImg.src = e.target.result;
+          editProfileImg.dataset.base64 = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Handle form submission
+    editProfileForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      
+      const bio = document.getElementById('edit-bio').value;
+      const headline = document.getElementById('edit-headline').value;
+      const education = document.getElementById('edit-education').value;
+      const experience = document.getElementById('edit-experience').value;
+      const languages = document.getElementById('edit-languages').value;
+      const website = document.getElementById('edit-website').value;
+      
+      // Validate and truncate inputs to prevent exceeding database limits
+      const truncate = (str, maxLength) => str ? str.substring(0, maxLength) : null;
+      
+      // Format education and experience as JSON objects since they are JSONB fields in the database
+      const educationJson = education ? JSON.stringify([{ institution: truncate(education, 250) }]) : null;
+      const experienceJson = experience ? JSON.stringify([{ description: truncate(experience, 250) }]) : null;
+      
+      // Create update data object
+      const updateData = {
+        bio: bio || null,
+        headline: truncate(headline, 250) || null,
+        education: educationJson,
+        experience: experienceJson,
+        languages: languages ? languages.split(',').map(lang => truncate(lang.trim(), 100)) : null,
+        website: truncate(website, 250) || null
+      };
+      
+      // Add profile picture if it was changed
+      if (editProfileImg.dataset.base64) {
+        // Always resize the image to prevent database issues
+        const base64String = editProfileImg.dataset.base64;
+        
+        // Create an image for resizing
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          // Use higher quality image - now that database can handle it
+          const maxWidth = 250;  // Increased from 80px
+          const maxHeight = 250; // Increased from 80px
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > height) {
+            if (width > maxWidth) {
+              height *= maxWidth / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width *= maxHeight / height;
+              height = maxHeight;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert to base64
+          const resizedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+          
+          // Only use if size is under 1MB
+          if (resizedBase64 && typeof resizedBase64.length === 'number' && resizedBase64.length < 1024 * 1024) {
+            updateData.profilePhoto = resizedBase64;
+          } else {
+            // Use UI Avatars service instead of base64 image
+            const usernameElem = document.getElementById('username');
+            let firstName = 'User', lastName = '';
+            if (usernameElem && typeof usernameElem.textContent === 'string') {
+              const parts = usernameElem.textContent.trim().split(' ');
+              firstName = parts[0] || 'User';
+              lastName = parts[1] || '';
+            }
+            // Create a URL to UI Avatars service
+            updateData.profilePhoto = `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}+${encodeURIComponent(lastName)}&background=00BFA6&color=fff&size=128&bold=true`;
+            showToast("Image too large for upload. Using avatar with initials instead.");
+          }
+          
+          // Now proceed with the API call
+          updateProfile(updateData);
+        };
+        img.src = base64String;
+      } else {
+        updateProfile(updateData);
+      }
+    });
+    
+    // Profile update helper function
+    async function updateProfile(updateData) {
+      try {
+        // Create minimal update data
+        const minimalUpdate = {
+          // Just a single line bio with strict size limit
+          bio: updateData.bio ? updateData.bio.substring(0, 100) : null,
+          
+          // Minimal headline with strict size limit
+          headline: updateData.headline ? updateData.headline.substring(0, 50) : null,
+          
+          // Use simple empty JSON for these fields 
+          education: "[]",
+          experience: "[]"
+        };
+        
+        // Only add profile pic if it's small enough
+        if (updateData.profilePhoto) {
+          // Check the size of the image
+          const imageSize = updateData.profilePhoto.length;
+          console.log(`Profile image size: ${(imageSize / 1024).toFixed(2)}KB`);
+          
+          // Only include profile photo if it's under 100KB or is a UI avatar URL
+          if (imageSize < 100000 || updateData.profilePhoto.startsWith('https://ui-avatars.com')) {
+            // Add profile photo to update data
+            minimalUpdate.profilePhoto = updateData.profilePhoto;
+            
+            // Also add it as profileImage for backward compatibility
+            minimalUpdate.profileImage = updateData.profilePhoto;
+            
+            console.log("Profile photo accepted and will be sent to server");
+          } else {
+            console.warn("Profile image too large, not sending to server");
+            showToast("Image too large (max 100KB). Using default avatar.");
+          }
+        }
+        
+        console.log("Sending profile update...");
+        
+        // Make API call to update profile
+        const response = await fetch('http://localhost:5000/api/users/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(minimalUpdate)
+        });
+        
+        // Get response text first
+        const responseText = await response.text();
+        
+        try {
+          // Try to parse as JSON
+          const data = JSON.parse(responseText);
+          
+          if (!response.ok) {
+            // If we have JSON error message
+            if (data && data.error) {
+              if (data.error.includes("too large")) {
+                // Image too large error
+                showToast("Profile image too large. Try using a smaller image.");
+                throw new Error("Profile image too large: " + data.error);
+              } else {
+                // Other error
+                throw new Error(data.error);
+              }
+            } else {
+              throw new Error('Failed to update profile');
+            }
+          }
+          
+          // Success case - update local user data in localStorage
+          console.log('Profile updated successfully. Updating local data...');
+          
+          // Get existing user data from localStorage
+          const storedUserData = localStorage.getItem('user');
+          let userData = null;
+          
+          if (storedUserData) {
+            try {
+              userData = JSON.parse(storedUserData);
+              
+              // Update the profile image fields
+              if (minimalUpdate.profilePhoto) {
+                userData.profilePhoto = minimalUpdate.profilePhoto;
+                userData.profileImage = minimalUpdate.profilePhoto; // Duplicate for compatibility
+                userData.avatar = minimalUpdate.profilePhoto; // Also set as avatar for compatibility
+              }
+              
+              // Update other fields
+              if (minimalUpdate.bio) userData.bio = minimalUpdate.bio;
+              if (minimalUpdate.headline) userData.headline = minimalUpdate.headline;
+              
+              // Save updated user data back to localStorage
+              localStorage.setItem('user', JSON.stringify(userData));
+              console.log('Local user data updated with new profile image:', userData);
+            } catch (e) {
+              console.error('Error updating local user data:', e);
+            }
+          }
+          
+          showToast('Profile updated successfully');
+          hideModal();
+          
+          // Update the profile image on the page
+          if (minimalUpdate.profilePhoto) {
+            document.getElementById('profile-img').src = minimalUpdate.profilePhoto;
+            
+            // Force refresh profile images in sidebars by triggering image-cache-buster if it exists
+            if (typeof window.refreshProfileImages === 'function') {
+              console.log('Refreshing all profile images...');
+              setTimeout(window.refreshProfileImages, 300);
+            }
+          }
+          
+          // Refresh profile data
+          setTimeout(() => {
+            fetchUserProfile();
+          }, 500);
+          
+        } catch (jsonError) {
+          // If response text isn't valid JSON
+          if (response.ok) {
+            // If status was OK but we couldn't parse JSON, still count as success
+            console.log('Profile updated successfully (non-JSON response)');
+            showToast('Profile updated successfully');
+            hideModal();
+            
+            setTimeout(() => {
+              fetchUserProfile();
+            }, 500);
+          } else {
+            // Error case with invalid JSON
+            console.error("Error parsing response:", jsonError);
+            console.error("Response text:", responseText);
+            throw new Error(`Server error: ${response.status} ${response.statusText}`);
+          }
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        showToast(error.message || 'Error updating profile. Please try again.');
+      }
+    }
+  </script>
+  <script>
+    particlesJS('particles-js', {
+        "particles": {
+            "number": {
+                "value": 80,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": "#00bfa6"
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                }
+            },
+            "opacity": {
+                "value": 0.3,
+                "random": false
+            },
+            "size": {
+                "value": 3,
+                "random": true
+            },
+            "line_linked": {
+                "enable": true,
+                "distance": 150,
+                "color": "#00bfa6",
+                "opacity": 0.4,
+                "width": 1
+            },
+            "move": {
+                "enable": true,
+                "speed": 6,
+                "direction": "none",
+                "random": false,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false
+            }
+        }
+    });
+  </script>
+</body>
+</html>

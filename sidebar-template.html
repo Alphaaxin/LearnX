@@ -1,0 +1,42 @@
+<!-- Sidebar Navigation Template -->
+<div class="w-64 bg-[#1f1f1f] p-6 h-screen fixed top-0 left-0">
+  <div class="flex flex-col space-y-6">
+    <!-- Sidebar Placeholder - will be replaced by sidebar-loader.js -->
+    <div class="sidebar-placeholder"></div>
+
+    <a href="index.html" class="text-2xl font-semibold text-[#00bfa6] hover:text-[#009e8d] transition-colors">LearnX</a>
+    <ul class="flex flex-col space-y-4">
+      <li><a href="dashboard.html" class="hover:text-[#00bfa6] hover:scale-105 transition-transform">Dashboard</a></li>
+      <li><a href="teach.html" class="hover:text-[#00bfa6] hover:scale-105 transition-transform">Teach</a></li>
+      <li><a href="learn.html" class="hover:text-[#00bfa6] hover:scale-105 transition-transform">Learn</a></li>
+      <li><a href="profile.html" class="hover:text-[#00bfa6] hover:scale-105 transition-transform">Profile</a></li>
+      <li><a href="chat.html" class="hover:text-[#00bfa6] hover:scale-105 transition-transform">Chat</a></li>
+      <li><a href="schedule.html" class="hover:text-[#00bfa6] hover:scale-105 transition-transform">Schedule</a></li>
+      <li><a href="wallet.html" class="hover:text-[#00bfa6] hover:scale-105 transition-transform">Wallet</a></li>
+      <li><a href="settings.html" class="hover:text-[#00bfa6] hover:scale-105 transition-transform">Settings</a></li>
+      <li><a href="#" onclick="logout()" class="hover:text-red-500 hover:scale-105 transition-transform">Logout</a></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  // Function to handle logout
+  function logout() {
+    localStorage.removeItem('token');
+    window.location.href = 'login.html';
+  }
+  
+  // Function to highlight the active page in the sidebar
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentPage = window.location.pathname.split('/').pop();
+    const sidebarLinks = document.querySelectorAll('.w-64 ul a');
+    
+    sidebarLinks.forEach(link => {
+      const linkHref = link.getAttribute('href');
+      if (linkHref === currentPage) {
+        link.classList.add('text-[#00bfa6]', 'font-bold');
+        link.classList.remove('hover:text-[#00bfa6]');
+      }
+    });
+  });
+</script> 

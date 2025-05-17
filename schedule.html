@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule - LearnX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Calendar API -->
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script src="https://apis.google.com/js/platform.js"></script>
+  <!-- FullCalendar -->
+  <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css' rel='stylesheet' />
+  <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.print.min.css' rel='stylesheet' media='print' />
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js'></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      background: linear-gradient(135deg, #1E201E, #3C3D37, #697565);
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    /* FullCalendar Custom Styles */
+    .fc-today {
+      background-color: rgba(0, 191, 166, 0.15) !important;
+    }
+    .gradient-bg {
+      background: linear-gradient(135deg, #1E201E, #3C3D37, #697565);
+    }
+    .text-primary {
+      color: #00bfa6;
+    }
+    .text-secondary {
+      color: #b5b5b5;
+    }
+    .bg-surface-1 {
+      background-color: #232723;
+    }
+    .bg-surface-2 {
+      background-color: #2d2d2d;
+    }
+    .bg-surface-3 {
+      background-color: #3C3D37;
+    }
+    .card {
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+      background-color: rgba(35, 39, 35, 0.8);
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(0, 191, 166, 0.1) 0%, rgba(0, 0, 0, 0) 60%);
+      z-index: 1;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      border-color: rgba(0, 191, 166, 0.2);
+    }
+    .card:hover::before {
+      background: linear-gradient(135deg, rgba(0, 191, 166, 0.2) 0%, rgba(0, 0, 0, 0) 60%);
+    }
+    .card-content {
+      position: relative;
+      z-index: 2;
+      padding: 1.5rem;
+    }
+    .stat-icon {
+      border-radius: var(--radius-md);
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(135deg, rgba(0, 191, 166, 0.2) 0%, rgba(0, 165, 144, 0.2) 100%);
+    }
+    .sidebar-link {
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+      padding-left: 10px;
+    }
+    .sidebar-link:hover, .sidebar-link.active {
+      border-left-color: #00bfa6;
+      background-color: rgba(0, 191, 166, 0.1);
+    }
+    .action-btn {
+      transition: all 0.3s ease;
+    }
+    .action-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 10px rgba(0, 191, 166, 0.3);
+    }
+    .btn-primary {
+      background-color: #00bfa6;
+      color: #fff;
+      transition: all 0.3s;
+    }
+    .btn-primary:hover {
+      background-color: #009e8d;
+    }
+    .btn-secondary {
+      background-color: #3C3D37;
+      color: #fff;
+      transition: all 0.3s;
+    }
+    .btn-secondary:hover {
+      background-color: #00bfa6;
+      color: #fff;
+    }
+    
+    /* Calendar View Toggle Styles */
+    .calendar-view-btn {
+      color: #b5b5b5;
+    }
+    .calendar-view-btn.active {
+      background-color: rgba(0, 191, 166, 0.2);
+      color: #00bfa6;
+    }
+    .calendar-view-btn:hover:not(.active) {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Calendar Event Styles */
+    .fc-event {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .fc-event:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+    }
+    .fc-teaching-event {
+      background-color: #00bfa6 !important;
+      border-color: #00bfa6 !important;
+    }
+    .fc-learning-event {
+      background-color: #3C3D37 !important;
+      border-color: #3C3D37 !important;
+    }
+    .fc-other-event {
+      background-color: #697565 !important;
+      border-color: #697565 !important;
+    }
+    
+    /* Stat Card Styles */
+    .stat-card {
+      transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    :root {
+      --radius-md: 0.375rem;
+      --radius-lg: 0.5rem;
+    }
+  </style>
+</head>
+<body class="gradient-bg text-white font-sans antialiased">
+  <div id="particles-js" class="fixed top-0 left-0 w-full h-full z-0 opacity-40 pointer-events-none"></div>
+  <div class="flex">
+    <!-- Sidebar placeholder - will be replaced by sidebar-loader.js -->
+    <div class="sidebar-placeholder"></div>
+    <!-- Main Content -->
+    <div class="flex-1 ml-64 p-8">
+      <header class="mb-8 border-b border-[#3C3D37] pb-4">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-[#00BFA6]">Your Schedule</h2>
+        <p class="text-lg text-secondary">Manage your learning and teaching sessions in one place</p>
+      </header>
+      <!-- Booked Sessions Section -->
+      <div class="card mb-8">
+        <div class="card-content">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+              <div class="stat-icon bg-[#00bfa6] text-white mr-4">
+                <i class="fas fa-user-check"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold">Your Booked Sessions</h3>
+                <p class="text-sm text-gray-400">Upcoming learning sessions</p>
+              </div>
+            </div>
+          </div>
+          <div id="loading-indicator" class="bg-surface-2 p-4 rounded-lg text-center hidden">
+            <p class="text-secondary">Loading sessions...</p>
+          </div>
+          <div id="error-container" class="bg-surface-2 p-4 rounded-lg text-center text-red-400 hidden"></div>
+          <div id="booked-upcoming-sessions" class="space-y-3">
+            <!-- Booked sessions will be dynamically populated here -->
+            <div id="no-booked-sessions" class="bg-surface-2 p-4 rounded-lg text-center">
+              <p class="text-secondary">No booked sessions yet. Book a session to see it here!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Set Availability Section -->
+      <div id="availability-section" class="card bg-[#2d2d2d] border border-[#3C3D37] p-6 rounded-xl mb-8" >
+        <h4 class="text-lg font-semibold mb-4 flex items-center">
+          <i class="fas fa-clock text-primary mr-2"></i>
+          Set Your Availability
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-2">Days Available</label>
+              <div class="flex flex-wrap gap-2">
+                <label class="inline-flex items-center mr-3"><input type="checkbox" class="form-checkbox h-5 w-5 text-[#00bfa6]" name="day" value="monday"><span class="ml-2">Mon</span></label>
+                <label class="inline-flex items-center mr-3"><input type="checkbox" class="form-checkbox h-5 w-5 text-[#00bfa6]" name="day" value="tuesday"><span class="ml-2">Tue</span></label>
+                <label class="inline-flex items-center mr-3"><input type="checkbox" class="form-checkbox h-5 w-5 text-[#00bfa6]" name="day" value="wednesday"><span class="ml-2">Wed</span></label>
+                <label class="inline-flex items-center mr-3"><input type="checkbox" class="form-checkbox h-5 w-5 text-[#00bfa6]" name="day" value="thursday"><span class="ml-2">Thu</span></label>
+                <label class="inline-flex items-center mr-3"><input type="checkbox" class="form-checkbox h-5 w-5 text-[#00bfa6]" name="day" value="friday"><span class="ml-2">Fri</span></label>
+                <label class="inline-flex items-center mr-3"><input type="checkbox" class="form-checkbox h-5 w-5 text-[#00bfa6]" name="day" value="saturday"><span class="ml-2">Sat</span></label>
+                <label class="inline-flex items-center"><input type="checkbox" class="form-checkbox h-5 w-5 text-[#00bfa6]" name="day" value="sunday"><span class="ml-2">Sun</span></label>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-2">Time Range</label>
+              <div class="flex items-center space-x-4">
+                <div>
+                  <label class="block text-xs mb-1">From</label>
+                  <select id="time-from" class="bg-[#3d3d3d] text-white rounded p-2 w-full">
+                    <option value="8">8:00 AM</option>
+                    <option value="9">9:00 AM</option>
+                    <option value="10">10:00 AM</option>
+                    <option value="11">11:00 AM</option>
+                    <option value="12">12:00 PM</option>
+                    <option value="13">1:00 PM</option>
+                    <option value="14">2:00 PM</option>
+                    <option value="15">3:00 PM</option>
+                    <option value="16">4:00 PM</option>
+                    <option value="17">5:00 PM</option>
+                    <option value="18">6:00 PM</option>
+                    <option value="19">7:00 PM</option>
+                    <option value="20">8:00 PM</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs mb-1">To</label>
+                  <select id="time-to" class="bg-[#3d3d3d] text-white rounded p-2 w-full">
+                    <option value="9">9:00 AM</option>
+                    <option value="10">10:00 AM</option>
+                    <option value="11">11:00 AM</option>
+                    <option value="12">12:00 PM</option>
+                    <option value="13">1:00 PM</option>
+                    <option value="14">2:00 PM</option>
+                    <option value="15">3:00 PM</option>
+                    <option value="16">4:00 PM</option>
+                    <option value="17">5:00 PM</option>
+                    <option value="18">6:00 PM</option>
+                    <option value="19">7:00 PM</option>
+                    <option value="20">8:00 PM</option>
+                    <option value="21">9:00 PM</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <button id="save-availability" class="bg-[#00bfa6] hover:bg-[#009e8d] text-white py-2 px-6 rounded-lg transition-colors flex items-center btn-primary">
+            <i class="fas fa-save mr-2"></i>
+            Save Availability
+          </button>
+        </div>
+      </div>
+      <!-- Calendar Section -->
+      <div class="card mb-8">
+        <div class="card-content">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+              <div class="stat-icon bg-[#00bfa6] text-white mr-4">
+                <i class="fas fa-calendar-alt"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold">Your Calendar</h3>
+                <p class="text-sm text-gray-400">View and manage all your sessions</p>
+              </div>
+            </div>
+            <div>
+              <button id="authorize-button" class="btn-primary py-2 px-4 rounded-lg flex items-center action-btn">
+                <i class="fas fa-sync-alt mr-2"></i> Sync with Google
+              </button>
+            </div>
+          </div>
+          <div id="calendar-container" class="mt-6">
+            <div class="flex gap-4 mb-4">
+              <div class="stat-card flex-1 bg-surface-1 p-4 rounded-lg flex items-center gap-3">
+                <div class="stat-icon">
+                  <i class="fas fa-calendar-day"></i>
+                </div>
+                <div>
+                  <div class="text-xs text-gray-400">Today</div>
+                  <div class="text-xl font-semibold" id="today-date"></div>
+                </div>
+              </div>
+              <div class="stat-card flex-1 bg-surface-1 p-4 rounded-lg flex items-center gap-3">
+                <div class="stat-icon">
+                  <i class="fas fa-calendar-check"></i>
+                </div>
+                <div>
+                  <div class="text-xs text-gray-400">Upcoming Events</div>
+                  <div class="text-xl font-semibold" id="upcoming-events-count">0</div>
+                </div>
+              </div>
+              <div class="stat-card flex-1 bg-surface-1 p-4 rounded-lg flex items-center gap-3">
+                <div class="stat-icon">
+                  <i class="fas fa-user-graduate"></i>
+                </div>
+                <div>
+                  <div class="text-xs text-gray-400">Teaching Hours</div>
+                  <div class="text-xl font-semibold" id="teaching-hours">0h</div>
+                </div>
+              </div>
+            </div>
+            <div id="calendar" class="bg-surface-1 p-4 rounded-lg shadow-lg"></div>
+            <div class="flex justify-between items-center mt-4">
+              <div class="calendar-legend flex gap-4">
+                <div class="flex items-center">
+                  <div class="w-3 h-3 rounded-full bg-[#00bfa6] mr-2"></div>
+                  <span class="text-sm text-gray-300">Teaching Sessions</span>
+                </div>
+                <div class="flex items-center">
+                  <div class="w-3 h-3 rounded-full bg-[#3C3D37] mr-2"></div>
+                  <span class="text-sm text-gray-300">Learning Sessions</span>
+                </div>
+                <div class="flex items-center">
+                  <div class="w-3 h-3 rounded-full bg-[#697565] mr-2"></div>
+                  <span class="text-sm text-gray-300">Other Events</span>
+                </div>
+              </div>
+              <div class="calendar-view-toggle flex bg-surface-2 rounded-lg overflow-hidden p-1">
+                <button class="calendar-view-btn active py-1 px-3 text-sm rounded-md " data-view="month">Month</button>
+                <button class="calendar-view-btn py-1 px-3 text-sm rounded-md " data-view="week">Week</button>
+                <button class="calendar-view-btn py-1 px-3 text-sm rounded-md " data-view="day">Day</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Session History Section -->
+      <div id="history-section" class="card bg-[#2d2d2d] border border-[#3C3D37] p-6 rounded-xl mb-4" >
+        <h4 class="text-lg font-semibold mb-4 flex items-center">
+          <i class="fas fa-history text-[#00bfa6] mr-2"></i>
+          Session History
+        </h4>
+        <div id="history-list" class="space-y-3">
+          <!-- History items will be populated here -->
+          <div class="bg-[#2d2d2d] p-4 rounded-lg flex justify-between items-center animate-pulse">
+            <div>
+              <p class="text-gray-400">Loading history...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Toast Notification -->
+      <div id="toast" class="fixed bottom-8 right-8 z-50 bg-[#232723] text-white px-6 py-4 rounded-lg shadow-lg hidden">
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <h4 class="font-medium">Information</h4>
+            <button onclick="document.getElementById('toast').classList.add('hidden')" class="text-gray-400 hover:text-white">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div id="toast-message" class="text-sm text-secondary">This is a notification.</div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <footer class="bg-[#1f1f1f] py-6 text-center text-white mt-8">
+        <p>&copy; 2025 LearnX - All Rights Reserved</p>
+      </footer>
+    </div>
+  </div>
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="js/sidebar-loader.js"></script>
+  <script src="js/schedule.js"></script>
+  <script src="js/auth-check.js"></script>
+  <!-- Initialize AOS -->  
+  <script>
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+  </script>
+  <!-- Particles.js Configuration -->
+  <script>
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 100, density: { enable: true, value_area: 800 } },
+        color: { value: ['#ffffff', '#00BFA6', '#3C3D37'] },
+        shape: { type: 'circle' },
+        opacity: { value: 0.7, random: true, anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false } },
+        size: { value: 3, random: true, anim: { enable: true, speed: 2, size_min: 0.5, sync: false } },
+        line_linked: { enable: true, distance: 100, color: '#00BFA6', opacity: 0.4, width: 1 },
+        move: { enable: true, speed: 3, direction: 'none', random: true, straight: false, out_mode: 'out', bounce: false, attract: { enable: false } }
+      },
+      interactivity: {
+        detect_on: 'canvas',
+        events: { 
+          onhover: { enable: true, mode: 'bubble' }, 
+          onclick: { enable: true, mode: 'push' }, 
+          resize: true 
+        },
+        modes: { 
+          grab: { distance: 400, line_linked: { opacity: 1 } }, 
+          bubble: { distance: 250, size: 6, duration: 2, opacity: 0.8, speed: 3 }, 
+          repulse: { distance: 200, duration: 0.4 }, 
+          push: { particles_nb: 4 }, 
+          remove: { particles_nb: 2 } 
+        }
+      },
+      retina_detect: true
+    });
+  </script>
+  
+  <!-- Common utility functions -->
+  <script>
+    // Define global toast notification function first
+    window.showToast = function(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+      
+      if (!toast || !toastMessage) {
+        console.error('Toast elements not found in the DOM');
+        return;
+      }
+      
+      // Set message content
+      if (typeof message === 'string') {
+        toastMessage.textContent = message;
+      } else {
+        toastMessage.textContent = 'Notification';
+      }
+      
+      // Set title based on type
+      const titleElement = toast.querySelector('h4');
+      if (titleElement) {
+        if (type === 'error') {
+          titleElement.textContent = 'Error';
+        } else if (type === 'success') {
+          titleElement.textContent = 'Success';
+        } else {
+          titleElement.textContent = 'Information';
+        }
+      }
+      
+      // Set type-specific styling
+      toast.className = 'fixed bottom-8 right-8 z-50 px-6 py-4 rounded-lg shadow-lg';
+      
+      if (type === 'error') {
+        toast.classList.add('bg-red-800', 'text-white');
+      } else if (type === 'success') {
+        toast.classList.add('bg-green-700', 'text-white');
+      } else {
+        toast.classList.add('bg-[#232723]', 'text-white');
+      }
+      
+      // Show toast
+      toast.classList.remove('hidden');
+      
+      // Hide after 5 seconds
+      setTimeout(function() {
+        toast.classList.add('hidden');
+      }, 5000);
+    };
+  </script>
+  
+  <!-- Google Calendar Integration -->
+  <script>
+    // Google Calendar API configuration
+    const CLIENT_ID = '440757775196-oqjct9f0bluutks7r6f6n7rp98ek2dco.apps.googleusercontent.com'; // Google API Client ID
+    const API_KEY = 'AIzaSyBl3AOMuqE24YFb3C1eU8E39kEIOzK4aK8'; // Google API Key
+    const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+    const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
+    
+    let authorizeButton = document.getElementById('authorize-button');
+    let totalTeachingHours = 0;
+    let upcomingEventsCount = 0;
+    
+    // Initialize the Google API client
+    function handleClientLoad() {
+      // Initialize date first before any async operations
+      updateTodayDate();
+      
+      // Check if dev environment
+      const isLocalhost = window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1' || 
+                         window.location.hostname.includes('192.168.');
+      
+      if (isLocalhost) {
+        console.log('Running on localhost - using demo data instead of Google Calendar');
+        // Skip Google API loading in development to avoid origin errors
+        initializeEmptyCalendar();
+        return;
+      }
+      
+      // Only load Google API in production environment
+      gapi.load('client:auth2', initClient);
+    }
+    
+    // Update today's date in the stat card
+    function updateTodayDate() {
+      const todayElement = document.getElementById('today-date');
+      const today = new Date();
+      const options = { weekday: 'short', month: 'short', day: 'numeric' };
+      todayElement.textContent = today.toLocaleDateString('en-US', options);
+    }
+    
+    function initClient() {
+      try {
+        gapi.client.init({
+          apiKey: API_KEY,
+          clientId: CLIENT_ID,
+          discoveryDocs: DISCOVERY_DOCS,
+          scope: SCOPES
+        }).then(function () {
+          // Listen for sign-in state changes
+          gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+          
+          // Handle the initial sign-in state
+          updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+          authorizeButton.onclick = handleAuthClick;
+        }).catch(function(error) {
+          console.error('Error initializing the Google API client', error);
+          // Use the schedule.js showToast function instead of showNotification
+          if (typeof showToast === 'function') {
+            showToast('Could not connect to Google Calendar. Please try again later.', 'error');
+          } else {
+            console.warn('showToast function not available');
+          }
+        });
+      } catch (e) {
+        console.error('Exception during Google API initialization:', e);
+        // Fallback to basic calendar functionality without Google integration
+        if (typeof showToast === 'function') {
+          showToast('Running in offline mode. Google Calendar features disabled.', 'info');
+        }
+        // Initialize the calendar with default empty events
+        initializeEmptyCalendar();
+      }
+    }
+    
+    function updateSigninStatus(isSignedIn) {
+      if (isSignedIn) {
+        authorizeButton.innerHTML = '<i class="fas fa-check mr-2"></i> Connected to Google';
+        authorizeButton.classList.add('bg-green-600');
+        listUpcomingEvents();
+      } else {
+        authorizeButton.innerHTML = '<i class="fas fa-sync-alt mr-2"></i> Sync with Google';
+        authorizeButton.classList.remove('bg-green-600');
+        // Reset stats if signed out
+        document.getElementById('upcoming-events-count').textContent = '0';
+        document.getElementById('teaching-hours').textContent = '0h';
+      }
+    }
+    
+    function handleAuthClick() {
+      if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
+        gapi.auth2.getAuthInstance().signOut();
+        showNotification('Disconnected from Google Calendar', 'info');
+      } else {
+        gapi.auth2.getAuthInstance().signIn().then(function() {
+          showNotification('Successfully connected to Google Calendar', 'success');
+        }).catch(function(error) {
+          console.error('Error during sign in', error);
+          showNotification('Failed to connect to Google Calendar', 'error');
+        });
+      }
+    }
+    
+    // Helper function to show a notification
+    function showNotification(message, type) {
+      // Always use the global showToast function
+      window.showToast(message, type);
+    }
+    
+    // Calculate hours from event
+    function calculateHours(start, end) {
+      const startTime = new Date(start).getTime();
+      const endTime = new Date(end).getTime();
+      const durationMs = endTime - startTime;
+      return durationMs / (1000 * 60 * 60); // Convert to hours
+    }
+    
+    // Categorize an event based on its title
+    function categorizeEvent(event) {
+      const title = event.summary.toLowerCase();
+      
+      if (title.includes('teach') || title.includes('teaching') || title.includes('lecture') || title.includes('mentor')) {
+        return 'teaching';
+      } else if (title.includes('learn') || title.includes('class') || title.includes('course') || title.includes('study')) {
+        return 'learning';
+      } else {
+        return 'other';
+      }
+    }
+    
+    // Display events in the calendar
+    // Initialize empty calendar when Google Calendar is not available
+    function initializeEmptyCalendar() {
+      // Sample events to show when offline
+      const demoEvents = [
+        {
+          title: 'Demo Teaching Session',
+          start: moment().add(1, 'days').hours(10).minutes(0).toDate(),
+          end: moment().add(1, 'days').hours(11).minutes(30).toDate(),
+          className: 'fc-teaching-event',
+          backgroundColor: '#00bfa6',
+          borderColor: '#00bfa6',
+          description: 'This is a demo teaching session (offline mode)',
+          extendedProps: { category: 'teaching' }
+        },
+        {
+          title: 'Demo Learning Session',
+          start: moment().add(2, 'days').hours(14).minutes(0).toDate(),
+          end: moment().add(2, 'days').hours(15).minutes(30).toDate(),
+          className: 'fc-learning-event',
+          backgroundColor: '#3C3D37',
+          borderColor: '#3C3D37',
+          description: 'This is a demo learning session (offline mode)',
+          extendedProps: { category: 'learning' }
+        }
+      ];
+      
+      // Update stats with demo data
+      document.getElementById('upcoming-events-count').textContent = '2';
+      document.getElementById('teaching-hours').textContent = '1.5h';
+      
+      // Add demo events to calendar
+      $('#calendar').fullCalendar('removeEvents');
+      $('#calendar').fullCalendar('addEventSource', demoEvents);
+    }
+    
+    function listUpcomingEvents() {
+      gapi.client.calendar.events.list({
+        'calendarId': 'primary',
+        'timeMin': (new Date()).toISOString(),
+        'showDeleted': false,
+        'singleEvents': true,
+        'maxResults': 50, // Increased to get more events
+        'orderBy': 'startTime'
+      }).then(function(response) {
+        const events = response.result.items;
+        const calendarEvents = [];
+        totalTeachingHours = 0;
+        upcomingEventsCount = 0;
+        
+        if (events && events.length > 0) {
+          upcomingEventsCount = events.length;
+          document.getElementById('upcoming-events-count').textContent = upcomingEventsCount;
+          
+          for (let i = 0; i < events.length; i++) {
+            const event = events[i];
+            let when = event.start.dateTime;
+            let end = event.end.dateTime;
+            
+            if (!when) {
+              when = event.start.date;
+              end = event.end.date;
+            }
+            
+            // Categorize the event
+            const category = categorizeEvent(event);
+            let className = 'fc-other-event';
+            let color = '#697565';
+            
+            if (category === 'teaching') {
+              className = 'fc-teaching-event';
+              color = '#00bfa6';
+              // Calculate teaching hours
+              if (when && end) {
+                totalTeachingHours += calculateHours(when, end);
+              }
+            } else if (category === 'learning') {
+              className = 'fc-learning-event';
+              color = '#3C3D37';
+            }
+            
+            calendarEvents.push({
+              id: event.id,
+              title: event.summary,
+              start: when,
+              end: end,
+              url: event.htmlLink,
+              className: className,
+              backgroundColor: color,
+              borderColor: color,
+              description: event.description || '',
+              location: event.location || '',
+              extendedProps: {
+                category: category
+              }
+            });
+          }
+        } else {
+          document.getElementById('upcoming-events-count').textContent = '0';
+        }
+        
+        // Update teaching hours
+        document.getElementById('teaching-hours').textContent = totalTeachingHours.toFixed(1) + 'h';
+        
+        // Initialize FullCalendar
+        $('#calendar').fullCalendar('removeEvents');
+        $('#calendar').fullCalendar('addEventSource', calendarEvents);
+        
+        showNotification(`Loaded ${upcomingEventsCount} events from your calendar`, 'success');
+      }).catch(function(error) {
+        console.error('Error loading calendar events', error);
+        showNotification('Failed to load calendar events', 'error');
+      });
+    }
+    
+    // Initialize FullCalendar
+    $(document).ready(function() {
+      // Initialize today's date
+      updateTodayDate();
+      
+      // Initialize calendar
+      $('#calendar').fullCalendar({
+        header: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'month,agendaWeek,agendaDay'
+        },
+        themeSystem: 'standard',
+        navLinks: true,
+        editable: false,
+        eventLimit: true,
+        events: [],
+        height: 650,
+        aspectRatio: 1.8,
+        eventClick: function(calEvent, jsEvent, view) {
+          // Show event details in a tooltip/popup
+          const eventDetails = `
+            <div class="p-4 bg-[#232723] rounded-lg shadow-lg">
+              <h3 class="font-bold text-lg mb-2">${calEvent.title}</h3>
+              <p class="mb-2"><i class="fas fa-calendar-day mr-2"></i>${moment(calEvent.start).format('MMM DD, YYYY')}</p>
+              <p class="mb-2"><i class="fas fa-clock mr-2"></i>${moment(calEvent.start).format('h:mm A')} - ${moment(calEvent.end).format('h:mm A')}</p>
+              ${calEvent.location ? `<p class="mb-2"><i class="fas fa-map-marker-alt mr-2"></i>${calEvent.location}</p>` : ''}
+              ${calEvent.description ? `<p class="mb-4">${calEvent.description}</p>` : ''}
+              <a href="${calEvent.url}" target="_blank" class="btn-primary py-2 px-4 rounded-lg inline-block">Open in Google Calendar</a>
+            </div>
+          `;
+          
+          const toast = document.getElementById('toast');
+          const toastMessage = document.getElementById('toast-message');
+          
+          // Set event details in the toast
+          toast.querySelector('h4').textContent = calEvent.title;
+          toastMessage.innerHTML = eventDetails;
+          
+          // Show toast
+          toast.classList.remove('hidden');
+          toast.classList.add('animate__animated', 'animate__fadeInUp');
+          
+          // Don't open Google Calendar directly
+          return false;
+        },
+        eventRender: function(event, element) {
+          element.css('border-radius', '4px');
+          element.find('.fc-time').prepend('<i class="fas fa-clock mr-1"></i> ');
+          
+          // Add tooltips to events
+          element.attr('title', event.title);
+          
+          // Add category icons based on event type
+          if (event.extendedProps && event.extendedProps.category) {
+            let icon = 'fa-calendar';
+            if (event.extendedProps.category === 'teaching') {
+              icon = 'fa-chalkboard-teacher';
+            } else if (event.extendedProps.category === 'learning') {
+              icon = 'fa-user-graduate';
+            }
+            
+            element.find('.fc-title').prepend(`<i class="fas ${icon} mr-1"></i> `);
+          }
+        },
+        dayRender: function(date, cell) {
+          // Add hover effect to days
+          $(cell).css('transition', 'background-color 0.3s');
+          $(cell).hover(
+            function() { $(this).css('background-color', 'rgba(0, 191, 166, 0.1)'); },
+            function() { $(this).css('background-color', ''); }
+          );
+          
+          // Highlight current day
+          const today = moment().startOf('day');
+          const cellDate = moment(date).startOf('day');
+          
+          if (today.isSame(cellDate)) {
+            cell.css('background-color', 'rgba(0, 191, 166, 0.15)');
+            cell.css('font-weight', 'bold');
+          }
+        },
+        viewRender: function(view, element) {
+          // Update active view button
+          $('.calendar-view-btn').removeClass('active');
+          if (view.name === 'month') {
+            $('[data-view="month"]').addClass('active');
+          } else if (view.name === 'agendaWeek') {
+            $('[data-view="week"]').addClass('active');
+          } else if (view.name === 'agendaDay') {
+            $('[data-view="day"]').addClass('active');
+          }
+        }
+      });
+      
+      // Handle calendar view buttons
+      $('.calendar-view-btn').on('click', function() {
+        const view = $(this).data('view');
+        if (view === 'month') {
+          $('#calendar').fullCalendar('changeView', 'month');
+        } else if (view === 'week') {
+          $('#calendar').fullCalendar('changeView', 'agendaWeek');
+        } else if (view === 'day') {
+          $('#calendar').fullCalendar('changeView', 'agendaDay');
+        }
+        
+        // Update active state
+        $('.calendar-view-btn').removeClass('active');
+        $(this).addClass('active');
+      });
+      
+      // Apply dark theme styles to FullCalendar
+      $('.fc-button').addClass('bg-[#3C3D37] text-white hover:bg-[#4a4d46] border-[#3C3D37]');
+      $('.fc-unthemed th, .fc-unthemed td, .fc-unthemed thead, .fc-unthemed tbody, .fc-unthemed .fc-divider, .fc-unthemed .fc-row, .fc-unthemed .fc-content, .fc-unthemed .fc-popover, .fc-unthemed .fc-list-view, .fc-unthemed .fc-list-heading td')
+        .css('border-color', 'rgba(255, 255, 255, 0.1)');
+      $('.fc-day-header').css({
+        'color': '#fff',
+        'padding': '10px 0',
+        'font-weight': '600',
+        'background': 'rgba(0, 191, 166, 0.1)'
+      });
+      $('.fc-day-number').css('color', '#fff');
+      $('.fc-unthemed').css('background-color', 'rgba(35, 39, 35, 0.4)');
+      
+      // Refresh events hourly
+      setInterval(function() {
+        if (gapi.auth2 && gapi.auth2.getAuthInstance() && gapi.auth2.getAuthInstance().isSignedIn.get()) {
+          listUpcomingEvents();
+        }
+      }, 60 * 60 * 1000); // every hour
+      
+      // Set up event handlers for any stat card clicks
+      $('.stat-card').on('click', function() {
+        const cardType = $(this).find('.stat-icon i').attr('class');
+        
+        // Different actions based on which stat card was clicked
+        if (cardType.includes('calendar-day')) {
+          // Go to today
+          $('#calendar').fullCalendar('today');
+          // Switch to day view
+          $('#calendar').fullCalendar('changeView', 'agendaDay');
+          $('.calendar-view-btn').removeClass('active');
+          $('[data-view="day"]').addClass('active');
+        } else if (cardType.includes('calendar-check')) {
+          // Show upcoming events - switch to week view
+          $('#calendar').fullCalendar('changeView', 'agendaWeek');
+          $('.calendar-view-btn').removeClass('active');
+          $('[data-view="week"]').addClass('active');
+        } else if (cardType.includes('user-graduate')) {
+          // Filter to show teaching sessions
+          showNotification('Focusing on teaching sessions', 'info');
+          $('#calendar').fullCalendar('removeEvents');
+          gapi.client.calendar.events.list({
+            'calendarId': 'primary',
+            'timeMin': (new Date()).toISOString(),
+            'showDeleted': false,
+            'singleEvents': true,
+            'maxResults': 50
+          }).then(function(response) {
+            const events = response.result.items;
+            const teachingEvents = [];
+            
+            if (events && events.length > 0) {
+              for (let i = 0; i < events.length; i++) {
+                const event = events[i];
+                const category = categorizeEvent(event);
+                
+                if (category === 'teaching') {
+                  let when = event.start.dateTime;
+                  let end = event.end.dateTime;
+                  
+                  if (!when) {
+                    when = event.start.date;
+                    end = event.end.date;
+                  }
+                  
+                  teachingEvents.push({
+                    id: event.id,
+                    title: event.summary,
+                    start: when,
+                    end: end,
+                    url: event.htmlLink,
+                    className: 'fc-teaching-event',
+                    backgroundColor: '#00bfa6',
+                    borderColor: '#00bfa6',
+                    description: event.description || '',
+                    location: event.location || '',
+                    extendedProps: {
+                      category: 'teaching'
+                    }
+                  });
+                }
+              }
+              
+              // Add teaching events to calendar
+              $('#calendar').fullCalendar('addEventSource', teachingEvents);
+            }
+          });
+        }
+      });
+    });
+    
+    // Function to update today's date display
+    function updateTodayDate() {
+      const todayElement = document.getElementById('today-date');
+      if (todayElement) {
+        const today = new Date();
+        const options = { weekday: 'short', month: 'short', day: 'numeric' };
+        todayElement.textContent = today.toLocaleDateString('en-US', options);
+      }
+    }
+  </script>
+  
+  <!-- Load Google API only after page is fully ready -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // First make sure all our UI is initialized
+      updateTodayDate();
+      initializeCalendarUI();
+      
+      // Only then try to load Google API
+      const script = document.createElement('script');
+      script.src = 'https://apis.google.com/js/api.js';
+      script.async = true;
+      script.defer = true;
+      script.onload = function() {
+        // Safe to call now that the script is loaded
+        setTimeout(handleClientLoad, 100); // Small delay to ensure everything is ready
+      };
+      document.body.appendChild(script);
+    });
+    
+    // Initialize calendar UI without any events
+    function initializeCalendarUI() {
+      // Set up all event handlers and UI components
+      $(document).ready(function() {
+        $('#calendar').fullCalendar({
+          header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+          },
+          themeSystem: 'standard',
+          navLinks: true,
+          editable: false,
+          eventLimit: true,
+          events: [],
+          height: 650,
+          aspectRatio: 1.8,
+          // All other calendar config...
+        });
+        
+        // Apply dark theme styles to FullCalendar
+        $('.fc-button').addClass('bg-[#3C3D37] text-white hover:bg-[#4a4d46] border-[#3C3D37]');
+        $('.fc-day-header').css({
+          'color': '#fff',
+          'padding': '10px 0',
+          'font-weight': '600',
+          'background': 'rgba(0, 191, 166, 0.1)'
+        });
+        $('.fc-day-number').css('color', '#fff');
+      });
+    }
+  </script>
+  <script src="js/sidebar-loader.js"></script>
+  <script src="js/schedule.js"></script>
+  <script src="js/auth-check.js"></script>
+</body>
+</html>
