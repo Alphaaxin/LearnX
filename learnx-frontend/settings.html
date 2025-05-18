@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - LearnX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+      <style>
+    .gradient-bg {
+      background: linear-gradient(135deg, #1E201E, #3C3D37, #697565);
+    }
+    body {
+      background: linear-gradient(135deg, #1E201E, #3C3D37, #697565);
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    /* Add some custom styles */
+    .settings-section {
+      background: rgba(30, 32, 30, 0.8); /* semi-transparent, matches .card in learn.html */
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 32px;
+      transition: transform var(--transition-normal);
+    }
+    .settings-section:hover {
+      transform: translateY(-5px);
+    }
+
+    /* Toast notification styles */
+    .toast-notification {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: white;
+      padding: 1rem 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      max-width: 350px;
+    }
+    .toast-notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .input-field {
+      background-color: rgba(60, 61, 55, 0.8);
+      border: 1px solid rgba(105, 117, 101, 0.4);
+      color: white;
+    }
+    .input-field:focus {
+      border-color: #00bfa6;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body class="gradient-bg text-white font-sans antialiased">
+  <div id="particles-js" class="absolute top-0 left-0 w-full h-full z-10 opacity-30 pointer-events-none"></div>
+
+  <!-- Flex container for sidebar and content -->
+  <div class="flex">
+    <!-- Sidebar Placeholder - will be replaced by sidebar-loader.js -->
+    <div class="sidebar-placeholder"></div>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-64 p-8">
+      <h2 class="text-3xl md:text-4xl font-semibold mb-6" data-aos="fade-up">Account Settings</h2>
+
+      <!-- Profile Settings -->
+      <div id="profile-settings" class="settings-section" data-aos="fade-up">
+        <h3 class="text-2xl font-semibold mb-4">Profile Settings</h3>
+        <!-- Add form fields for profile settings (e.g., username, email, bio) with IDs -->
+        <!-- Example fields: -->
+        <p class="text-secondary">Add your profile details here...</p>
+        </div>
+
+      <!-- Account Settings -->
+      <div id="account-settings" class="settings-section" data-aos="fade-up">
+        <h3 class="text-2xl font-semibold mb-4">Account Settings</h3>
+        <!-- Password Change Form -->
+        <div class="card bg-surface-2 p-6 rounded-xl shadow-lg mb-8" data-aos="fade-up">
+          <h3 class="text-2xl font-semibold mb-4">Change Password</h3>
+          <form id="change-password-form" action="#" method="POST" class="space-y-6">
+            <div class="flex flex-col space-y-2">
+              <label for="currentPassword" class="text-lg">Current Password</label>
+              <input type="password" id="currentPassword" name="currentPassword" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter your current password">
+            </div>
+
+            <div class="flex flex-col space-y-2">
+              <label for="newPassword" class="text-lg">New Password</label>
+              <input type="password" id="newPassword" name="newPassword" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter your new password">
+            </div>
+
+            <div class="flex flex-col space-y-2">
+              <label for="confirmPassword" class="text-lg">Confirm New Password</label>
+              <input type="password" id="confirmPassword" name="confirmPassword" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Confirm your new password">
+              <p id="password-error" class="text-red-400 hidden">Passwords do not match</p>
+            </div>
+
+            <button type="submit" class="btn btn-primary py-3 px-6 rounded-lg">Change Password</button>
+          </form>
+        </div>
+        <!-- Linked Accounts -->
+        <div class="card bg-surface-2 p-6 rounded-xl shadow-lg mb-8" data-aos="fade-up">
+          <h3 class="text-2xl font-semibold mb-4">Linked Accounts</h3>
+          <div class="flex flex-col space-y-4">
+            <div class="flex justify-between items-center">
+              <p class="text-lg">Google</p>
+              <button class="btn btn-primary py-2 px-6 rounded-lg">Unlink</button>
+            </div>
+            <div class="flex justify-between items-center">
+              <p class="text-lg">LinkedIn</p>
+              <button class="btn btn-primary py-2 px-6 rounded-lg">Unlink</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Privacy Settings -->
+        <div class="card bg-surface-2 p-6 rounded-xl shadow-lg" data-aos="fade-up">
+          <h3 class="text-2xl font-semibold mb-4">Privacy Settings</h3>
+          <form action="#" method="POST" class="space-y-6">
+            <div class="flex items-center space-x-4">
+              <input type="checkbox" id="profileVisibility" name="profileVisibility" class="text-primary">
+              <label for="profileVisibility" class="text-lg">Make profile public</label>
+            </div>
+
+            <div class="flex items-center space-x-4">
+              <input type="checkbox" id="searchVisibility" name="searchVisibility" class="text-primary">
+              <label for="searchVisibility" class="text-lg">Allow my profile to be found in search</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary py-3 px-6 rounded-lg">Save Privacy Settings</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Notification Preferences -->
+      <div id="notification-settings" class="settings-section" data-aos="fade-up">
+        <h3 class="text-2xl font-semibold mb-4">Notification Preferences</h3>
+        <form action="#" method="POST" class="space-y-6">
+          <div class="flex items-center space-x-4">
+            <input type="checkbox" id="emailNotifications" name="emailNotifications" class="text-primary">
+            <label for="emailNotifications" class="text-lg">Receive email notifications</label>
+          </div>
+
+          <div class="flex items-center space-x-4">
+            <input type="checkbox" id="smsNotifications" name="smsNotifications" class="text-primary">
+            <label for="smsNotifications" class="text-lg">Receive SMS notifications</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary py-3 px-6 rounded-lg">Save Preferences</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-notification">
+    <div class="flex items-center">
+      <i class="fas fa-check-circle text-primary text-xl mr-3"></i>
+      <div>
+        <h4 class="font-medium">Success</h4>
+        <p class="text-sm text-secondary" id="toast-message">Settings saved successfully!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AOS Animation Init -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="js/sidebar-loader.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+    
+    // Add form submission handlers to show toast notification
+    document.querySelectorAll('form').forEach(form => {
+      if (form.id === 'change-password-form') {
+        // Special handling for password change form
+        form.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          const currentPassword = document.getElementById('currentPassword').value;
+          const newPassword = document.getElementById('newPassword').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+          const errorElement = document.getElementById('password-error');
+          
+          // Basic validation
+          if (!currentPassword || !newPassword || !confirmPassword) {
+            errorElement.textContent = "All password fields are required";
+            errorElement.classList.remove('hidden');
+            return;
+          }
+          
+          if (newPassword !== confirmPassword) {
+            errorElement.textContent = "New passwords do not match";
+            errorElement.classList.remove('hidden');
+            return;
+          }
+          
+          // Hide any previous error
+          errorElement.classList.add('hidden');
+          
+          // Get user token
+          const token = localStorage.getItem('token');
+          if (!token) {
+            showToast('You must be logged in to change your password', 'error');
+            return;
+          }
+          
+          try {
+            // Show loading state on button
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Updating...';
+            
+            // Call the API to change password
+            const response = await fetch('http://localhost:5000/api/auth/change-password', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                currentPassword,
+                newPassword
+              })
+            });
+            
+            // Reset the form after submission regardless of success
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+            
+            if (!response.ok) {
+              const data = await response.json().catch(() => ({}));
+              throw new Error(data.message || 'Failed to change password');
+            }
+            
+            // Password changed successfully
+            showToast('Password changed successfully!', 'success');
+            form.reset();
+          } catch (error) {
+            console.error('Error changing password:', error);
+            showToast(error.message || 'Failed to change password', 'error');
+          }
+        });
+      } else {
+        // Regular form handling for other forms
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          // Show toast notification
+          showToast('Settings updated successfully!');
+        });
+      }
+    });
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+      
+      if (!toast || !toastMessage) return;
+      
+      // Set message
+      toastMessage.textContent = message;
+      
+      // Remove previous classes
+      toast.className = 'toast-notification';
+      
+      // Apply styling based on type
+      if (type === 'error') {
+        toast.classList.add('bg-red-500', 'text-white');
+        toast.querySelector('i').className = 'fas fa-times-circle text-white text-xl mr-3';
+        toast.querySelector('h4').textContent = 'Error';
+      } else if (type === 'success') {
+        toast.classList.add('bg-green-500', 'text-white');
+        toast.querySelector('i').className = 'fas fa-check-circle text-white text-xl mr-3';
+        toast.querySelector('h4').textContent = 'Success';
+      } else {
+        toast.classList.add('bg-blue-500', 'text-white');
+        toast.querySelector('i').className = 'fas fa-info-circle text-white text-xl mr-3';
+        toast.querySelector('h4').textContent = 'Information';
+      }
+      
+      // Show the toast
+      toast.classList.add('show');
+      
+      // Hide after 5 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 5000);
+    }
+
+    // Placeholder function to fetch user settings data
+    async function fetchSettingsData(userId) {
+      // TODO: Integrate with your backend API to fetch user settings data
+      // Replace this with your actual API call
+      console.log(`Fetching settings data for user ID: ${userId}`);
+      // In a real implementation, this would be:
+      // const response = await fetch(`/api/settings/${userId}`);
+      // const data = await response.json();
+      // return data.settings;
+      
+      // For now, return mock data
+      return {
+        emailNotifications: true,
+        smsNotifications: false,
+        profileVisibility: true,
+        searchVisibility: true
+      };
+    }
+
+    // Placeholder function to display user settings data
+    function displaySettingsData(settingsData) {
+      // Populate the HTML elements with the fetched settings data
+      if (settingsData) {
+        document.getElementById('emailNotifications').checked = settingsData.emailNotifications;
+        document.getElementById('smsNotifications').checked = settingsData.smsNotifications;
+        document.getElementById('profileVisibility').checked = settingsData.profileVisibility;
+        document.getElementById('searchVisibility').checked = settingsData.searchVisibility;
+      }
+    }
+
+    // Call fetchSettingsData when the page loads
+    document.addEventListener('DOMContentLoaded', async () => {
+      const userId = localStorage.getItem('userId') || 'placeholderUserId';
+      const settingsData = await fetchSettingsData(userId);
+      displaySettingsData(settingsData);
+    });
+  </script>
+  <script>
+    particlesJS('particles-js', {
+        "particles": {
+            "number": {
+                "value": 80,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": "#00bfa6"
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                }
+            },
+            "opacity": {
+                "value": 0.3,
+                "random": false
+            },
+            "size": {
+                "value": 3,
+                "random": true
+            },
+            "line_linked": {
+                "enable": true,
+                "distance": 150,
+                "color": "#00bfa6",
+                "opacity": 0.4,
+                "width": 1
+            },
+            "move": {
+                "enable": true,
+                "speed": 6,
+                "direction": "none",
+                "random": false,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false
+            }
+        }
+    });
+  </script>
+</body>
+</html>

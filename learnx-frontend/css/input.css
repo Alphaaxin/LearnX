@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { 
+    scroll-behavior: smooth; 
+  }
+
+  body { 
+    @apply bg-gradient-custom bg-fixed bg-cover bg-no-repeat;
+  }
+}
+
+@layer components {
+  #particles-js {
+    @apply z-0;
+  }
+
+  .main-content, .card {
+    @apply relative z-5;
+  }
+
+  .gradient-bg { 
+    @apply bg-gradient-custom;
+  }
+
+  .card { 
+    @apply transition-all duration-300 ease-in-out border border-white/5;
+  }
+
+  .card:hover { 
+    @apply transform -translate-y-1 shadow-lg border-primary/20;
+  }
+
+  .text-secondary { 
+    @apply text-[#b5b5b5];
+  }
+
+  .bg-surface-1 { 
+    @apply bg-[#232723];
+  }
+
+  .bg-surface-2 { 
+    @apply bg-[#2d2d2d];
+  }
+
+  .bg-surface-3 { 
+    @apply bg-[#3C3D37];
+  }
+
+  .btn-primary { 
+    @apply bg-primary text-white transition-colors duration-300;
+  }
+
+  .btn-primary:hover { 
+    @apply bg-[#009e8d];
+  }
+
+  .btn-secondary { 
+    @apply bg-[#3C3D37] text-white transition-colors duration-300;
+  }
+
+  .btn-secondary:hover { 
+    @apply bg-primary;
+  }
+}

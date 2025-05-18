@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teach on LearnX</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+    .gradient-bg {
+      background: linear-gradient(135deg, #1E201E, #3C3D37, #697565);
+    }
+    body {
+      background: linear-gradient(135deg, #1E201E, #3C3D37, #697565);
+    }
+    .toast-notification {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: white;
+      padding: 1rem 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    .toast-notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    /* Direct CSS fixes for sidebar avatar */
+    #sidebar-avatar {
+      width: 40px !important;
+      height: 40px !important;
+      min-width: 40px !important;
+      min-height: 40px !important;
+      border-radius: 50% !important;
+      overflow: hidden !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background-color: #00bfa6 !important;
+      color: white !important;
+      font-weight: 600 !important;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+      border: 2px solid rgba(255, 255, 255, 0.3) !important;
+      position: relative !important;
+      z-index: 1001 !important;
+    }
+    
+    #sidebar-avatar img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      object-position: center !important;
+      display: block !important;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  
+  <!-- Load our primary profile image fix first -->
+  <script src="js/fix-profile-image-final.js"></script>
+  
+  <!-- Load configuration -->
+  <script src="js/config.js"></script>
+  
+  <!-- Then load sidebar scripts -->
+  <script src="js/sidebar-loader.js"></script>
+</head>
+<body class="gradient-bg min-h-screen text-white font-sans">
+  <div id="particles-js" class="absolute top-0 left-0 w-full h-full z-10 opacity-30 pointer-events-none"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-surface-1 p-8 rounded-lg shadow-xl text-center">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      <p class="mt-4 text-secondary">Loading your teaching dashboard...</p>
+    </div>
+  </div>
+
+  <!-- Flex container for sidebar and content -->
+  <div class="flex">
+    <!-- Sidebar Placeholder - will be replaced by sidebar-loader.js -->
+    <div class="sidebar-placeholder"></div>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-64 p-8">
+      <!-- Header -->
+      <header class="text-center mb-12">
+        <h1 class="text-4xl font-bold mb-4">Teach on LearnX</h1>
+        <p class="text-xl text-secondary max-w-2xl mx-auto">Share your knowledge, inspire learners, and earn money by teaching what you love.</p>
+      </header>
+
+      <!-- Teaching Dashboard -->
+      <div id="teaching-dashboard" class="hidden">
+        <!-- Will be populated by JavaScript -->
+      </div>
+
+      <!-- Not Logged In Message -->
+      <div id="not-logged-in" class="hidden text-center py-12">
+        <h2 class="text-2xl font-semibold mb-4">Please log in to access the teaching dashboard</h2>
+        <p class="text-secondary mb-6">You need to be logged in to view your teaching profile and manage your courses.</p>
+        <a href="login.html" class="btn btn-primary py-2 px-6 rounded-lg inline-block">
+          Log In
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-notification">
+    <div class="flex items-center">
+      <i class="fas fa-info-circle text-primary text-xl mr-3"></i>
+      <div>
+        <h4 class="font-medium">Information</h4>
+        <p class="text-sm text-secondary" id="toast-message">This is a notification.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Refresh button - Fixed position -->
+  <button id="refresh-data-btn" class="fixed bottom-6 right-6 bg-primary text-white p-3 rounded-full shadow-lg flex items-center justify-center hover:bg-primary-dark transition-colors" title="Refresh booking data">
+    <i class="fas fa-sync-alt"></i>
+  </button>
+
+  <!-- Edit Session Modal -->
+  <div id="edit-session-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden overflow-y-auto py-10">
+    <div class="bg-surface-1 p-6 rounded-xl w-full max-w-2xl max-h-[80vh] overflow-y-auto my-auto relative">
+      <div class="flex justify-between items-center sticky top-0 bg-surface-1 pb-4 border-b border-gray-800 mb-6 z-10">
+        <h3 class="text-2xl font-bold">Edit Course</h3>
+        <button id="close-session-modal-btn" type="button" class="text-secondary hover:text-white p-2 cursor-pointer">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      
+      <form id="edit-session-form" class="space-y-6">
+        <input type="hidden" id="edit-session-id" value="">
+        
+        <!-- Title -->
+        <div>
+          <label for="edit-title" class="block text-lg mb-2">Session Title</label>
+          <input type="text" id="edit-title" name="title" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="E.g., JavaScript for Beginners" required />
+        </div>
+        
+        <!-- Description -->
+        <div>
+          <label for="edit-description" class="block text-lg mb-2">Description</label>
+          <textarea id="edit-description" name="description" rows="4" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Describe what students will learn in this session..." required></textarea>
+        </div>
+        
+        <!-- Category -->
+        <div>
+          <label for="edit-category" class="block text-lg mb-2">Category</label>
+          <select id="edit-category" name="category" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
+            <option value="" disabled>Select a category</option>
+            <option value="Coding">Coding</option>
+            <option value="Design">Design</option>
+            <option value="Music">Music</option>
+            <option value="Fitness">Fitness</option>
+            <option value="Business">Business</option>
+            <option value="Language">Language</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        
+        <!-- Price -->
+        <div>
+          <label for="edit-price" class="block text-lg mb-2">Price ($ per hour)</label>
+          <input type="number" id="edit-price" name="price" min="1" step="1" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="25" required />
+        </div>
+        
+        <!-- Duration -->
+        <div>
+          <label for="edit-duration" class="block text-lg mb-2">Duration (minutes)</label>
+          <select id="edit-duration" name="duration" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
+            <option value="" disabled>Select duration</option>
+            <option value="30">30 minutes</option>
+            <option value="60">60 minutes</option>
+            <option value="90">90 minutes</option>
+            <option value="120">120 minutes</option>
+          </select>
+        </div>
+        
+        <!-- Schedule -->
+        <div>
+          <label for="edit-schedule" class="block text-lg mb-2">Schedule Date and Time</label>
+          <input type="datetime-local" id="edit-schedule" name="schedule" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required />
+        </div>
+        
+        <!-- Max Students -->
+        <div>
+          <label for="edit-max-students" class="block text-lg mb-2">Maximum Students</label>
+          <input type="number" id="edit-max-students" name="max_students" min="1" max="20" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="10" required />
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="pt-4">
+          <button type="button" id="cancel-session-edit-btn" class="btn btn-secondary py-2 px-6 rounded-lg mr-3">Cancel</button>
+          <button type="submit" class="btn btn-primary py-3 px-8 rounded-lg font-semibold">
+            <i class="fas fa-save mr-2"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirmation dialog -->
+  <div id="confirm-dialog" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+    <div class="bg-surface-1 p-6 rounded-xl max-w-md w-full text-center">
+      <h3 class="text-xl font-bold mb-4" id="confirm-dialog-title">Confirm Action</h3>
+      <p class="mb-6 text-secondary" id="confirm-dialog-message">Are you sure you want to perform this action?</p>
+      <div class="flex justify-center space-x-4">
+        <button id="confirm-dialog-cancel" class="btn btn-secondary py-2 px-6 rounded-lg">Cancel</button>
+        <button id="confirm-dialog-confirm" class="btn btn-danger py-2 px-6 rounded-lg bg-red-600 hover:bg-red-700">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Utility Functions
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+      
+      // Set message and type
+      toastMessage.textContent = message;
+      
+      // Remove all previous type classes
+      toast.classList.remove('bg-blue-100', 'bg-red-100', 'bg-green-100', 'border-blue-500', 'border-red-500', 'border-green-500');
+      
+      // Add appropriate classes based on type
+      if (type === 'error') {
+        toast.classList.add('bg-red-500', 'text-white');
+      } else if (type === 'success') {
+        toast.classList.add('bg-green-500', 'text-white');
+      } else {
+        toast.classList.add('bg-blue-500', 'text-white');
+      }
+      
+      // Show the toast
+      toast.classList.add('show');
+      
+      // Hide after 5 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 5000);
+    }
+
+    // Token Management
+    function getToken() {
+      return localStorage.getItem('token');
+    }
+
+    function clearAuth() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+
+    function redirectToLogin() {
+      window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
+    }
+
+    // API Functions
+    async function fetchCurrentUser() {
+      const token = getToken();
+      if (!token) return null;
+      
+      try {
+        // First check if user data is in localStorage
+        const storedUserData = localStorage.getItem('user');
+        let userData = null;
+        
+        if (storedUserData) {
+          try {
+            userData = JSON.parse(storedUserData);
+            console.log('Using cached user data:', userData);
+          } catch (e) {
+            console.error('Error parsing stored user data:', e);
+          }
+        }
+        
+        if (!userData) {
+          // Get current user profile from API
+          const serverUrl = window.CONFIG?.SERVER_URL || 'http://localhost:5000';
+          const response = await fetch(`${serverUrl}/api/auth/me`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch user profile');
+          }
+          
+          const data = await response.json();
+          userData = data.user;
+          
+          // Ensure profile image is properly processed before caching
+          processProfileImageURLs(userData);
+          
+          // Cache the user data
+          localStorage.setItem('user', JSON.stringify(userData));
+        } else {
+          // Make sure cached data has proper image URLs
+          processProfileImageURLs(userData);
+        }
+        
+        return userData;
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        showToast('Error fetching user profile', 'error');
+        return null;
+      }
+    }
+    
+    /**
+     * Processes profile image URLs to ensure they are correctly formatted
+     * @param {Object} userData - The user data object
+     */
+    function processProfileImageURLs(userData) {
+      if (!userData) return;
+      
+      // Handle profile image paths
+      ['profileImage', 'profilePhoto', 'profilePicture', 'avatar'].forEach(field => {
+        const imagePath = userData[field];
+        if (imagePath && typeof imagePath === 'string') {
+          // Only process server paths, not data URLs or full URLs
+          if (!imagePath.startsWith('data:') && !imagePath.startsWith('http')) {
+            // Convert relative server paths to absolute URLs
+            const serverUrl = 'http://localhost:5000';
+            userData[field] = imagePath.startsWith('/') ? 
+              `${serverUrl}${imagePath}` : 
+              `${serverUrl}/uploads/${imagePath}`;
+          }
+        }
+      });
+      
+      return userData;
+    }
+
+    // UI Functions
+    function showLoading(show) {
+      const loadingOverlay = document.getElementById('loading-overlay');
+      if (show) {
+        loadingOverlay.classList.remove('hidden');
+      } else {
+        loadingOverlay.classList.add('hidden');
+      }
+    }
+
+    function showTeachingDashboard(user) {
+      const dashboard = document.getElementById('teaching-dashboard');
+      const notLoggedIn = document.getElementById('not-logged-in');
+      
+      if (user) {
+        dashboard.classList.remove('hidden');
+        notLoggedIn.classList.add('hidden');
+        
+        // Render dashboard content based on user role
+        if (user.role === 'teacher') {
+          renderTeacherDashboard(user);
+        } else {
+          renderBecomeTeacherUI();
+        }
+      } else {
+        dashboard.classList.add('hidden');
+        notLoggedIn.classList.remove('hidden');
+      }
+    }
+
+    // Helper function to create a default avatar
+    function createDefaultAvatar(name) {
+      const initial = name && name.length > 0 ? name.charAt(0).toUpperCase() : 'U';
+      // This isn't working correctly with template literals inside base64 SVG
+      // Creating a simple single-letter avatar using CSS instead
+      return null;
+    }
+
+    function renderTeacherDashboard(user) {
+      const dashboard = document.getElementById('teaching-dashboard');
+      // Get initial for fallback display
+      const userInitial = user.name && user.name.length > 0 ? user.name.charAt(0).toUpperCase() : 'U';
+      
+      // Extract name parts for UI Avatars
+      const nameParts = (user.name || '').split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.length > 1 ? nameParts[1] : '';
+      
+      // Check for profile image in different possible properties
+      const profileImage = user.profileImage || user.profilePhoto || user.profilePicture || user.avatar;
+      
+      // Generate appropriate profile image URL based on type
+      let imageUrl = '';
+      let fallbackUrl = `https://robohash.org/${encodeURIComponent(user.email || 'user')}?set=set3&bgset=bg1&size=200x200`;
+      
+      if (profileImage) {
+        if (profileImage.startsWith('data:') || profileImage.startsWith('http')) {
+          // Data URL or full URL - use directly
+          imageUrl = profileImage;
+        } else {
+          // Server-side path - construct full URL
+          const serverUrl = 'http://localhost:5000';
+          imageUrl = profileImage.startsWith('/') ? 
+            `${serverUrl}${profileImage}` : 
+            `${serverUrl}/uploads/${profileImage}`;
+        }
+      } else {
+        // No profile image - use fallback
+        imageUrl = fallbackUrl;
+      }
+      
+      dashboard.innerHTML = `
+        <div class="bg-surface-1 rounded-xl p-8 mb-8 shadow-lg">
+          <div class="flex flex-col md:flex-row items-center md:items-start">
+            <div class="w-32 h-32 rounded-full bg-surface-2 mb-4 md:mb-0 md:mr-8 overflow-hidden">
+              <img src="${imageUrl}" 
+                alt="${user.name || 'Teacher'}" 
+                class="w-full h-full object-cover"
+                onerror="
+                  if(this.src !== '${fallbackUrl}') {
+                    this.src='${fallbackUrl}';
+                  } else {
+                    this.style.display='none'; 
+                    this.parentNode.innerHTML = '<div class=\\'w-full h-full flex items-center justify-center bg-primary\\'><span class=\\'text-4xl font-bold text-white\\'>${userInitial}</span></div>';
+                  }
+                " />
+            </div>
+            <div class="text-center md:text-left">
+              <h2 class="text-2xl font-bold mb-2">Welcome back, ${user.name || 'Teacher'}!</h2>
+              <p class="text-secondary mb-4">Manage your courses and track your progress here.</p>
+              <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                <a href="create-listing.html" class="btn btn-primary py-2 px-6 rounded-lg inline-flex items-center">
+                  <i class="fas fa-plus mr-2"></i> Create New Course
+                </a>
+                <a href="profile.html" class="btn btn-secondary py-2 px-6 rounded-lg inline-flex items-center">
+                  <i class="fas fa-user-edit mr-2"></i> Edit Profile
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="bg-surface-1 rounded-xl p-6 shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-full bg-primary bg-opacity-20 mr-4">
+                <i class="fas fa-book text-primary text-xl"></i>
+              </div>
+              <div>
+                <p class="text-secondary text-sm">Active Courses</p>
+                <h3 class="text-2xl font-bold" id="active-courses">0</h3>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-surface-1 rounded-xl p-6 shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-full bg-success bg-opacity-20 mr-4">
+                <i class="fas fa-users text-success text-xl"></i>
+              </div>
+              <div>
+                <p class="text-secondary text-sm">Total Students</p>
+                <h3 class="text-2xl font-bold" id="total-students">0</h3>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-surface-1 rounded-xl p-6 shadow-lg">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-full bg-warning bg-opacity-20 mr-4">
+                <i class="fas fa-star text-warning text-xl"></i>
+              </div>
+              <div>
+                <p class="text-secondary text-sm">Average Rating</p>
+                <h3 class="text-2xl font-bold" id="average-rating">0.0</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-surface-1 rounded-xl p-8 mb-8 shadow-lg">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold">Your Courses</h3>
+            <a href="create-listing.html" class="text-primary hover:text-primary-dark text-sm font-medium">
+              <i class="fas fa-plus mr-1"></i> Add New
+            </a>
+          </div>
+          
+          <div id="courses-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Loading indicator -->
+            <div id="courses-loading" class="col-span-full text-center py-8">
+              <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mb-2"></div>
+              <p>Loading your courses...</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Fetch and display the user's sessions
+      fetchTeacherSessions(user.id);
+    }
+    
+    // Fetch the teacher's sessions from the API
+    async function fetchTeacherSessions(teacherId) {
+      try {
+        const token = getToken();
+        const serverUrl = window.CONFIG?.SERVER_URL || 'http://localhost:5000';
+        const response = await fetch(`${serverUrl}/api/sessions/teacher`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch sessions');
+        }
+        
+        const data = await response.json();
+        console.log("Teacher sessions:", data);
+        
+        // Update stats
+        if (data.sessions) {
+          document.getElementById('active-courses').textContent = data.sessions.length;
+          
+          // Count students across all sessions
+          let totalStudents = 0;
+          data.sessions.forEach(session => {
+            if (session.Bookings) {
+              totalStudents += session.Bookings.length;
+            }
+          });
+          document.getElementById('total-students').textContent = totalStudents;
+          
+          // Initialize previous booking counts when first loading
+          if (!window.previousBookingCounts) {
+            window.previousBookingCounts = {};
+          }
+          
+          // Store initial booking counts
+          data.sessions.forEach(session => {
+            const bookingCount = session.Bookings ? session.Bookings.length : 0;
+            window.previousBookingCounts[session.id] = bookingCount;
+            console.log(`Initial booking count for session ${session.id}: ${bookingCount}`);
+          });
+          
+          // Render the courses/sessions
+          renderCoursesList(data.sessions);
+        } else {
+          // No sessions found
+          renderCoursesList([]);
+        }
+      } catch (error) {
+        console.error('Error fetching teacher sessions:', error);
+        showToast('Error loading your courses', 'error');
+        
+        // Show empty state
+        renderCoursesList([]);
+      }
+    }
+    
+    // Render the list of courses
+    function renderCoursesList(sessions) {
+      console.log('Rendering courses list with sessions:', sessions);
+      
+      // Debug session IDs
+      if (sessions && sessions.length > 0) {
+        console.log('Session IDs in the list:');
+        sessions.forEach((session, index) => {
+          console.log(`Session ${index+1} ID:`, session.id);
+        });
+      }
+      
+      const coursesList = document.getElementById('courses-list');
+      const loadingElement = document.getElementById('courses-loading');
+      
+      // Remove loading indicator
+      if (loadingElement) {
+        loadingElement.remove();
+      }
+      
+      if (!sessions || sessions.length === 0) {
+        // Show empty state
+        coursesList.innerHTML = `
+          <div class="bg-surface-2 rounded-xl p-6 text-center col-span-full">
+            <div class="h-40 bg-surface-3 rounded-lg mb-4 flex items-center justify-center">
+              <i class="fas fa-book-open text-4xl text-secondary"></i>
+            </div>
+            <p class="text-secondary">No courses yet</p>
+            <a href="create-listing.html" class="text-primary hover:text-primary-dark text-sm font-medium mt-2 inline-block">
+              Create your first course
+            </a>
+          </div>
+        `;
+        return;
+      }
+      
+      // Clear existing content
+      coursesList.innerHTML = '';
+      
+      // Check if there's a highlighted session (recently created)
+      const highlightedSessionId = localStorage.getItem('lastCreatedSessionId');
+      
+      // Render each session
+      sessions.forEach(session => {
+        // Format date and time
+        const date = new Date(session.date);
+        const startTime = session.startTime;
+        const formattedDate = date.toLocaleDateString('en-US', { 
+          weekday: 'short', 
+          month: 'short', 
+          day: 'numeric',
+          year: 'numeric'
+        });
+        
+        // Determine if this session should be highlighted
+        const isHighlighted = highlightedSessionId && session.id.toString() === highlightedSessionId;
+        
+        // Create session card
+        const sessionCard = document.createElement('div');
+        sessionCard.className = `bg-surface-2 rounded-xl p-6 shadow-lg ${isHighlighted ? 'ring-2 ring-primary' : ''}`;
+        sessionCard.dataset.sessionId = session.id; // Add data-session-id attribute for updates
+        
+        // Store current booking count when rendering
+        if (window.previousBookingCounts) {
+          window.previousBookingCounts[session.id] = session.Bookings ? session.Bookings.length : 0;
+        }
+        
+        sessionCard.innerHTML = `
+          <div class="h-40 bg-surface-3 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+            <i class="fas ${getCategoryIcon(session.skill)} text-4xl text-secondary"></i>
+            ${isHighlighted ? '<span class="absolute top-2 right-2 bg-primary text-white text-xs px-2 py-1 rounded">New</span>' : ''}
+          </div>
+          <h3 class="font-bold text-lg mb-1 truncate">${session.title}</h3>
+          <p class="text-sm text-secondary mb-2 truncate">${session.skill || 'General'}</p>
+          <div class="flex items-center text-sm text-secondary mb-3">
+            <i class="fas fa-calendar-alt mr-1"></i>
+            <span>${formattedDate} at ${formatTime(startTime)}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-success">$${session.price}</span>
+            <div class="flex items-center text-sm text-secondary">
+              <i class="fas fa-user mr-1"></i>
+              <span class="booking-count">${(session.Bookings ? session.Bookings.length : 0)}/${session.maxParticipants}</span>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-gray-700 flex justify-between">
+            <button class="text-sm text-primary hover:text-primary-dark" onclick="editSession('${session.id}')">
+              <i class="fas fa-edit mr-1"></i> Edit
+            </button>
+            <button class="text-sm text-red-400 hover:text-red-300" onclick="deleteSession('${session.id}')">
+              <i class="fas fa-trash-alt mr-1"></i> Delete
+            </button>
+          </div>
+        `;
+        
+        coursesList.appendChild(sessionCard);
+      });
+      
+      // Clear the highlight after displaying it
+      if (highlightedSessionId) {
+        localStorage.removeItem('lastCreatedSessionId');
+      }
+    }
+    
+    // Helper function to get icon based on category
+    function getCategoryIcon(category) {
+      if (!category) return 'fa-chalkboard';
+      
+      category = category.toLowerCase();
+      if (category.includes('cod') || category.includes('program')) return 'fa-code';
+      if (category.includes('design')) return 'fa-palette';
+      if (category.includes('music')) return 'fa-music';
+      if (category.includes('fitness') || category.includes('sport')) return 'fa-dumbbell';
+      if (category.includes('business')) return 'fa-briefcase';
+      if (category.includes('language')) return 'fa-language';
+      
+      return 'fa-chalkboard';
+    }
+    
+    // Helper function to format time
+    function formatTime(timeString) {
+      if (!timeString) return '';
+      
+      try {
+        // If it's already in HH:MM format, parse it
+        const parts = timeString.split(':');
+        const hours = parseInt(parts[0]);
+        const minutes = parts[1];
+        
+        // Format in 12-hour clock
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const formattedHours = hours % 12 || 12;
+        
+        return `${formattedHours}:${minutes} ${period}`;
+      } catch (e) {
+        console.error('Error formatting time:', e);
+        return timeString;
+      }
+    }
+    
+    // Implement edit session functionality
+    async function editSession(id) {
+      console.log('Edit session:', id);
+      
+      try {
+        const token = getToken();
+        if (!token) {
+          showToast('You must be logged in to edit a session', 'error');
+          return;
+        }
+        
+        // Show loading in toast
+        showToast('Loading session details...', 'info');
+        
+        // Fetch the session details
+        const response = await fetch(`http://localhost:5000/api/sessions/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch session details');
+        }
+        
+        const session = await response.json();
+        console.log('Session details:', session);
+        
+        // Ensure we have a valid ID
+        if (!session.id && !id) {
+          throw new Error('Session ID not found');
+        }
+        
+        // Store session ID securely
+        const sessionId = session.id || id;
+        console.log('Using session ID for edit:', sessionId);
+        
+        // Populate the edit form - set session ID first and most importantly
+        document.getElementById('edit-session-id').value = sessionId;
+        document.getElementById('edit-title').value = session.title || '';
+        document.getElementById('edit-description').value = session.description || '';
+        
+        // Set the category dropdown
+        const categorySelect = document.getElementById('edit-category');
+        for(let i = 0; i < categorySelect.options.length; i++) {
+          if (categorySelect.options[i].value.toLowerCase() === (session.skill || '').toLowerCase()) {
+            categorySelect.selectedIndex = i;
+            break;
+          }
+        }
+        
+        document.getElementById('edit-price').value = session.price || '';
+        document.getElementById('edit-max-students').value = session.maxParticipants || 10;
+        
+        // Set the duration dropdown based on the difference between start and end time
+        let durationMinutes = 60; // default
+        if (session.startTime && session.endTime) {
+          const startParts = session.startTime.split(':').map(Number);
+          const endParts = session.endTime.split(':').map(Number);
+          const startMinutes = startParts[0] * 60 + startParts[1];
+          const endMinutes = endParts[0] * 60 + endParts[1];
+          durationMinutes = endMinutes - startMinutes;
+          if (durationMinutes < 0) durationMinutes += 24 * 60; // handle cases crossing midnight
+        }
+        
+        // Set duration dropdown
+        const durationSelect = document.getElementById('edit-duration');
+        for(let i = 0; i < durationSelect.options.length; i++) {
+          if (parseInt(durationSelect.options[i].value) === durationMinutes) {
+            durationSelect.selectedIndex = i;
+            break;
+          }
+        }
+        
+        // Format the date and time for datetime-local input
+        if (session.date && session.startTime) {
+          // Create date string in format YYYY-MM-DDThh:mm
+          const dateParts = session.date.split('T')[0].split('-');
+          const timeParts = session.startTime.split(':');
+          const formattedDateTime = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}T${timeParts[0]}:${timeParts[1]}`;
+          document.getElementById('edit-schedule').value = formattedDateTime;
+        }
+        
+        // Set minimum date for schedule to today
+        const today = new Date();
+        const isoDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        document.getElementById('edit-schedule').min = isoDate;
+        
+        // Show the modal
+        const modal = document.getElementById('edit-session-modal');
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Disable background scrolling
+        
+      } catch (error) {
+        console.error('Error loading session details:', error);
+        showToast('Error loading session details. Please try again.', 'error');
+      }
+    }
+    
+    // Implement delete session functionality
+    async function deleteSession(id) {
+      console.log('Delete session:', id);
+      
+      // Show confirmation dialog
+      const confirmDialog = document.getElementById('confirm-dialog');
+      const confirmTitle = document.getElementById('confirm-dialog-title');
+      const confirmMessage = document.getElementById('confirm-dialog-message');
+      const confirmButton = document.getElementById('confirm-dialog-confirm');
+      const cancelButton = document.getElementById('confirm-dialog-cancel');
+      
+      confirmTitle.textContent = 'Delete Course';
+      confirmMessage.textContent = 'Are you sure you want to delete this course? This action cannot be undone.';
+      
+      // Show the dialog
+      confirmDialog.classList.remove('hidden');
+      
+      // Set up event listeners for the buttons
+      const confirmPromise = new Promise((resolve, reject) => {
+        // Handle confirmation
+        confirmButton.onclick = () => {
+          confirmDialog.classList.add('hidden');
+          resolve(true);
+        };
+        
+        // Handle cancellation
+        cancelButton.onclick = () => {
+          confirmDialog.classList.add('hidden');
+          resolve(false);
+        };
+      });
+      
+      // Wait for user decision
+      const confirmed = await confirmPromise;
+      
+      if (confirmed) {
+        try {
+          const token = getToken();
+          if (!token) {
+            showToast('You must be logged in to delete a session', 'error');
+            return;
+          }
+          
+          // Show loading in toast
+          showToast('Deleting course...', 'info');
+          
+          // Send delete request
+          const response = await fetch(`http://localhost:5000/api/sessions/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Failed to delete session');
+          }
+          
+          // Show success message
+          showToast('Course deleted successfully', 'success');
+          
+          // Refresh the sessions list
+          const user = await fetchCurrentUser();
+          if (user) {
+            fetchTeacherSessions(user.id);
+          }
+          
+        } catch (error) {
+          console.error('Error deleting session:', error);
+          showToast(error.message || 'Error deleting course. Please try again.', 'error');
+        }
+      }
+    }
+
+    function renderBecomeTeacherUI() {
+      const dashboard = document.getElementById('teaching-dashboard');
+      dashboard.innerHTML = `
+        <div class="bg-surface-1 rounded-xl p-8 text-center max-w-3xl mx-auto shadow-lg">
+          <div class="bg-warning bg-opacity-20 border-l-4 border-warning text-white p-4 mb-8">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-circle text-warning text-xl"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm">
+                  You're currently registered as a student. Become a teacher to start creating and selling courses.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <h2 class="text-2xl font-bold mb-6">Become a Teacher on LearnX</h2>
+          <p class="text-secondary mb-8">
+            Join our community of expert instructors and share your knowledge with millions of students worldwide.
+            Start teaching today and earn money doing what you love.
+          </p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-surface-2 p-6 rounded-xl shadow-lg">
+              <div class="w-12 h-12 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-graduation-cap text-primary text-xl"></i>
+              </div>
+              <h3 class="font-semibold mb-2">Share Your Knowledge</h3>
+              <p class="text-sm text-secondary">Teach what you know and help others learn new skills.</p>
+            </div>
+            
+            <div class="bg-surface-2 p-6 rounded-xl shadow-lg">
+              <div class="w-12 h-12 bg-success bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-money-bill-wave text-success text-xl"></i>
+              </div>
+              <h3 class="font-semibold mb-2">Earn Money</h3>
+              <p class="text-sm text-secondary">Get paid for every student who enrolls in your courses.</p>
+            </div>
+            
+            <div class="bg-surface-2 p-6 rounded-xl shadow-lg">
+              <div class="w-12 h-12 bg-accent bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-users text-accent text-xl"></i>
+              </div>
+              <h3 class="font-semibold mb-2">Build Your Brand</h3>
+              <p class="text-sm text-secondary">Establish yourself as an expert in your field.</p>
+            </div>
+          </div>
+          
+          <button id="become-teacher-btn" class="btn btn-primary py-3 px-8 rounded-lg inline-flex items-center">
+            <i class="fas fa-chalkboard-teacher mr-2"></i> Become a Teacher
+          </button>
+          
+          <p class="text-xs text-gray-500 mt-4">By becoming a teacher, you agree to our Terms of Service and Privacy Policy.</p>
+        </div>
+      `;
+      
+      // Add event listener for become teacher button
+      document.getElementById('become-teacher-btn').addEventListener('click', handleBecomeTeacher);
+    }
+
+    // Event Handlers
+    async function handleBecomeTeacher() {
+      const button = document.getElementById('become-teacher-btn');
+      const originalText = button.innerHTML;
+      
+      try {
+        // Show loading state
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+        
+        const token = getToken();
+        if (!token) {
+          throw new Error('You must be logged in to become a teacher');
+        }
+        
+        const response = await fetch('http://localhost:5000/api/users/profile', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ role: 'both' })
+        });
+        
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          throw new Error(error.message || 'Failed to become a teacher');
+        }
+        
+        const data = await response.json();
+        
+        // Show success message and reload the page
+        showToast('You are now a teacher! Setting up your dashboard...', 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Error becoming a teacher:', error);
+        showToast(error.message || 'Failed to become a teacher. Please try again.', 'error');
+        button.disabled = false;
+        button.innerHTML = originalText;
+      }
+    }
+
+    // Initialize the page
+    async function init() {
+      showLoading(true);
+      
+      try {
+        // Check if user is logged in
+        const token = getToken();
+        if (!token) {
+          // Show message before redirecting
+          showToast("You must be logged in to access teacher features", "error");
+          setTimeout(() => {
+            redirectToLogin();
+          }, 2000);
+          return;
+        }
+        
+        try {
+          // Try to parse the token to see if it's valid
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          
+          // Get current user profile
+          const user = await fetchCurrentUser();
+          
+          if (!user) {
+            throw new Error('Failed to fetch user profile');
+          }
+          
+          // Run our profile image fix after user data is loaded
+          if (window.fixProfileImageGlobally) {
+            window.fixProfileImageGlobally();
+          }
+          
+          // Show appropriate UI based on user role
+          if (user.role === 'teacher' || user.role === 'both') {
+            showTeachingDashboard(user);
+            
+            // Set up auto-refresh for session data to show updated booking counts
+            setupSessionRefresh(user);
+          } else {
+            renderBecomeTeacherUI(user);
+          }
+        } catch (error) {
+          console.error("Error parsing token or fetching user:", error);
+          showToast("Authentication error. Please log in again.", "error");
+          setTimeout(() => {
+            clearAuth();
+            redirectToLogin();
+          }, 2000);
+        }
+      } catch (error) {
+        console.error('Initialization error:', error);
+        showToast('An error occurred while loading the page', 'error');
+        redirectToLogin();
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // Start the application
+    document.addEventListener('DOMContentLoaded', init);
+
+    // Set up the edit session form submission
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set up edit session modal close functionality
+      const editSessionModal = document.getElementById('edit-session-modal');
+      const closeSessionModalBtn = document.getElementById('close-session-modal-btn');
+      const cancelSessionEditBtn = document.getElementById('cancel-session-edit-btn');
+      
+      // Function to hide modal
+      function hideSessionModal() {
+        editSessionModal.classList.add('hidden');
+        document.body.style.overflow = 'auto'; // Re-enable scrolling
+      }
+      
+      // Close button click
+      closeSessionModalBtn.addEventListener('click', hideSessionModal);
+      cancelSessionEditBtn.addEventListener('click', hideSessionModal);
+      
+      // Close when clicking outside the modal content
+      editSessionModal.addEventListener('click', function(e) {
+        if (e.target === editSessionModal) {
+          hideSessionModal();
+        }
+      });
+      
+      // Handle form submission
+      const editSessionForm = document.getElementById('edit-session-form');
+      editSessionForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        try {
+          const token = getToken();
+          if (!token) {
+            showToast('You must be logged in to update a session', 'error');
+            return;
+          }
+          
+          // Show loading state
+          const submitBtn = this.querySelector('button[type="submit"]');
+          const originalBtnText = submitBtn.innerHTML;
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Updating session...';
+          
+          // Get form values - Get session ID first and validate it
+          const sessionId = document.getElementById('edit-session-id').value;
+          
+          // Check if we have a valid session ID
+          if (!sessionId) {
+            throw new Error('Session ID is missing. Please try again.');
+          }
+          
+          console.log('Updating session with ID:', sessionId);
+          
+          const title = document.getElementById('edit-title').value;
+          const description = document.getElementById('edit-description').value;
+          const category = document.getElementById('edit-category').value;
+          const price = document.getElementById('edit-price').value;
+          const duration = document.getElementById('edit-duration').value;
+          const schedule = document.getElementById('edit-schedule').value;
+          const maxStudents = document.getElementById('edit-max-students').value;
+          
+          // Validate form inputs
+          if (!title || title.trim() === '') {
+            showToast('Please enter a course title', 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+            return;
+          }
+          
+          if (!schedule) {
+            showToast('Please select a date and time', 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+            return;
+          }
+          
+          // Create data object based on what the server requires (match create-listing.html format)
+          const formattedDate = new Date(schedule).toISOString().split('T')[0]; // Get YYYY-MM-DD
+          const formattedStartTime = new Date(schedule).toTimeString().split(' ')[0]; // Get HH:MM:SS
+          const endDateTime = new Date(new Date(schedule).getTime() + parseInt(duration) * 60000);
+          const formattedEndTime = endDateTime.toTimeString().split(' ')[0]; // Get HH:MM:SS
+          
+          const updateData = {
+            title,
+            description,
+            skill: category,
+            date: formattedDate, 
+            startTime: formattedStartTime,
+            endTime: formattedEndTime,
+            sessionMode: "online",
+            exchangeType: "paid",
+            price: Number(price),
+            location: "Online",
+            maxParticipants: Number(maxStudents)
+          };
+          
+          console.log("Updating session with data:", updateData);
+          
+          // Send update request
+          console.log(`Making PUT request to: http://localhost:5000/api/sessions/${sessionId}`);
+          console.log("With data:", JSON.stringify(updateData, null, 2));
+
+          const response = await fetch(`http://localhost:5000/api/sessions/${sessionId}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+          });
+
+          // Log response details for debugging
+          console.log('Update API response status:', response.status);
+          const responseText = await response.text();
+          console.log('Response text:', responseText);
+
+          let responseData;
+          try {
+            // Try to parse as JSON if possible
+            responseData = JSON.parse(responseText);
+            console.log('Response data:', responseData);
+          } catch (error) {
+            console.log('Response is not valid JSON');
+          }
+
+          if (response.ok && responseData) {
+            // Show success message
+            showToast('Course updated successfully', 'success');
+            
+            // Close the modal
+            hideSessionModal();
+            
+            // Refresh the sessions list
+            const user = await fetchCurrentUser();
+            if (user) {
+              fetchTeacherSessions(user.id);
+            }
+          } else if (!response.ok) {
+            // Use the error message from the response if available
+            if (responseData && responseData.message) {
+              throw new Error(responseData.message);
+            } else if (responseData && responseData.error) {
+              throw new Error(responseData.error);
+            } else {
+              throw new Error('Failed to update session');
+            }
+          }
+          
+        } catch (error) {
+          console.error('Error updating session:', error);
+          showToast(error.message || 'Error updating course. Please try again.', 'error');
+          
+          // Reset button state
+          const submitBtn = this.querySelector('button[type="submit"]');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Save Changes';
+        }
+      });
+    });
+
+    // Setup auto-refresh of session data
+    function setupSessionRefresh(user) {
+      // Store the current booking counts to compare for changes
+      window.previousBookingCounts = {};
+      
+      // Set up refresh button
+      const refreshBtn = document.getElementById('refresh-data-btn');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+          // Show spinner animation on button while refreshing
+          const icon = this.querySelector('i');
+          icon.classList.remove('fa-sync-alt');
+          icon.classList.add('fa-spinner', 'fa-spin');
+          
+          // Force refresh data
+          refreshSessionData(user.id, true).then(() => {
+            // Restore button icon after refresh
+            setTimeout(() => {
+              icon.classList.remove('fa-spinner', 'fa-spin');
+              icon.classList.add('fa-sync-alt');
+            }, 500);
+          });
+        });
+      }
+      
+      // First auto-refresh after 30 seconds
+      setTimeout(() => { refreshSessionData(user.id); }, 30000);
+      
+      // Then continue with regular 60-second refreshes
+      setInterval(() => { refreshSessionData(user.id); }, 60000);
+      
+      // Also refresh when user comes back to this tab
+      document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+          // User has returned to the page, refresh data
+          refreshSessionData(user.id);
+        }
+      });
+    }
+
+    // Function to refresh session data without full page reload
+    async function refreshSessionData(userId, forceRefresh = false) {
+      try {
+        console.log('Auto-refreshing session data to check for new bookings...');
+        
+        const token = getToken();
+        if (!token) return;
+        
+        // Fetch the latest session data
+        const serverUrl = window.CONFIG?.SERVER_URL || 'http://localhost:5000';
+        const response = await fetch(`${serverUrl}/api/sessions/teacher`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          // Add cache busting to prevent cached responses
+          cache: 'no-cache'
+        });
+        
+        if (!response.ok) return;
+        
+        const data = await response.json();
+        if (!data.sessions || !data.sessions.length) return;
+        
+        // Initialize previousBookingCounts if it doesn't exist
+        if (!window.previousBookingCounts) {
+          window.previousBookingCounts = {};
+          console.log('Initialized previousBookingCounts object');
+          // For first run, just store current counts and return
+          data.sessions.forEach(session => {
+            const bookingsCount = session.Bookings ? session.Bookings.length : 0;
+            window.previousBookingCounts[session.id] = bookingsCount;
+            console.log(`Initial booking count for session ${session.id}: ${bookingsCount}`);
+          });
+          // Update the UI with the current data
+          updateSessionUI(data.sessions);
+          return;
+        }
+        
+        // Check for changes in booking counts
+        let bookingChanges = false;
+        const newBookingCounts = {};
+        
+        console.log('Comparing current and previous booking counts:');
+        data.sessions.forEach(session => {
+          const sessionId = session.id;
+          const bookingsCount = session.Bookings ? session.Bookings.length : 0;
+          newBookingCounts[sessionId] = bookingsCount;
+          
+          // Log the booking data for debugging
+          console.log(`Session ID ${sessionId}:`);
+          console.log(`- Current booking count: ${bookingsCount}`);
+          console.log(`- Previous booking count: ${window.previousBookingCounts[sessionId] !== undefined ? window.previousBookingCounts[sessionId] : 'not set'}`);
+          
+          // Detailed log of bookings
+          if (session.Bookings && session.Bookings.length > 0) {
+            console.log('- Booking details:');
+            session.Bookings.forEach((booking, i) => {
+              console.log(`  - #${i+1}: ID=${booking.id}, UserId=${booking.learnerId}`);
+            });
+          }
+          
+          // Check if this count differs from previous count or if force refresh
+          if (forceRefresh || 
+              window.previousBookingCounts[sessionId] === undefined || 
+              window.previousBookingCounts[sessionId] !== bookingsCount) {
+            bookingChanges = true;
+            console.log(`📊 Booking count changed for session ${sessionId}: ${window.previousBookingCounts[sessionId] !== undefined ? window.previousBookingCounts[sessionId] : 'initial'} → ${bookingsCount}`);
+          }
+        });
+        
+        // Update stored counts with new values
+        window.previousBookingCounts = {...newBookingCounts};
+        
+        if (bookingChanges || forceRefresh) {
+          // Show notification
+          showToast('New booking activity detected! Updating your course information...', 'success');
+          
+          // Update the UI with new data
+          updateSessionUI(data.sessions);
+          
+          // Update the stats
+          updateDashboardStats(data.sessions);
+        } else {
+          console.log('No changes in booking counts detected');
+        }
+      } catch (error) {
+        console.error('Error refreshing session data:', error);
+      }
+    }
+
+    // Update just the booking counts in the UI without full re-render
+    function updateSessionUI(sessions) {
+      sessions.forEach(session => {
+        const sessionId = session.id;
+        const bookingsCount = session.Bookings ? session.Bookings.length : 0;
+        const sessionCard = document.querySelector(`[data-session-id="${sessionId}"]`);
+        
+        if (sessionCard) {
+          // Update the booking count text
+          const bookingCountEl = sessionCard.querySelector('.booking-count');
+          if (bookingCountEl) {
+            bookingCountEl.textContent = `${bookingsCount}/${session.maxParticipants}`;
+            
+            // Highlight the change with animation
+            bookingCountEl.classList.add('animate-pulse', 'text-primary', 'font-bold');
+            setTimeout(() => {
+              bookingCountEl.classList.remove('animate-pulse', 'text-primary', 'font-bold');
+            }, 5000);
+          }
+        }
+      });
+    }
+
+    // Update dashboard stats
+    function updateDashboardStats(sessions) {
+      // Update active courses count
+      document.getElementById('active-courses').textContent = sessions.length;
+      
+      // Count total students
+      let totalStudents = 0;
+      sessions.forEach(session => {
+        if (session.Bookings) {
+          totalStudents += session.Bookings.length;
+        }
+      });
+      
+      const totalStudentsEl = document.getElementById('total-students');
+      // Animate the change
+      if (parseInt(totalStudentsEl.textContent) !== totalStudents) {
+        totalStudentsEl.classList.add('animate-pulse', 'text-success');
+        totalStudentsEl.textContent = totalStudents;
+        setTimeout(() => {
+          totalStudentsEl.classList.remove('animate-pulse', 'text-success');
+        }, 5000);
+      }
+    }
+  </script>
+  <script>
+    particlesJS('particles-js', {
+        "particles": {
+            "number": {
+                "value": 80,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": "#00bfa6"
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                }
+            },
+            "opacity": {
+                "value": 0.3,
+                "random": false
+            },
+            "size": {
+                "value": 3,
+                "random": true
+            },
+            "line_linked": {
+                "enable": true,
+                "distance": 150,
+                "color": "#00bfa6",
+                "opacity": 0.4,
+                "width": 1
+            },
+            "move": {
+                "enable": true,
+                "speed": 6,
+                "direction": "none",
+                "random": false,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false
+            }
+        }
+    });
+  </script>
+</body>
+</html>

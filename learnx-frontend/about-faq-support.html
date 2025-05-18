@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About, FAQ, Support - LearnX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  
+    body {
+      background: linear-gradient(135deg, #1E201E, #3C3D37, #697565)}
+    .faq-item {
+      border-bottom: 1px solid var(--surface-3);
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.3s ease-in-out;
+    }
+    .faq-item:hover {
+      transform: translateY(-3px);
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+  <div id="particles-js" class="absolute top-0 left-0 w-full h-full z-10 opacity-30 pointer-events-none"></div>
+<body class="gradient-bg gradient-bg text-white font-sans">
+
+  <!-- Flex container for sidebar and content -->
+  <div class="flex">
+    <!-- Sidebar Placeholder - will be replaced by sidebar-loader.js -->
+    <div class="sidebar-placeholder"></div>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-64 p-8">
+      <h2 class="text-3xl md:text-4xl font-semibold mb-6" data-aos="fade-up">About LearnX</h2>
+
+      <!-- About Section -->
+      <div class="card bg-surface-1 p-6 rounded-xl shadow-lg mb-8" data-aos="fade-up">
+        <h3 class="text-2xl font-semibold mb-4">Our Mission</h3>
+        <p class="text-secondary">LearnX is a peer-to-peer skill exchange platform dedicated to connecting individuals who want to learn new skills with those who are passionate about teaching them. Our mission is to foster a collaborative and accessible learning environment where knowledge is shared freely or through fair exchange.</p>
+        <p class="text-secondary mt-4">We believe that everyone has valuable skills to share, and everyone has the potential to learn. By removing traditional barriers and focusing on direct interaction, LearnX empowers individuals to expand their horizons and build a supportive learning community.</p>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="card bg-surface-1 p-6 rounded-xl shadow-lg mb-8" data-aos="fade-up">
+        <h3 class="text-2xl font-semibold mb-4">Frequently Asked Questions</h3>
+        <div class="space-y-6">
+          <div class="faq-item">
+            <h4 class="text-xl font-semibold text-primary">How does LearnX work?</h4>
+            <p class="text-secondary mt-2">LearnX connects learners with mentors for one-on-one or group sessions. You can search for skills you want to learn or list skills you can teach. Sessions can be paid or based on skill bartering.</p>
+          </div>
+          <div class="faq-item">
+            <h4 class="text-xl font-semibold text-primary">What kind of skills can I learn or teach?</h4>
+            <p class="text-secondary mt-2">You can learn or teach a wide range of skills, including coding, design, music, languages, fitness, business, and more. If you have a skill you want to share, you can create a listing.</p>
+          </div>
+          <div class="faq-item">
+            <h4 class="text-xl font-semibold text-primary">How do I become a mentor?</h4>
+            <p class="text-secondary mt-2">To become a mentor, simply sign up for an account and select the "Teacher" role. You can then create listings for the skills you want to teach and set your availability and session details.</p>
+          </div>
+          <div class="faq-item">
+            <h4 class="text-xl font-semibold text-primary">How do I book a session with a mentor?</h4>
+            <p class="text-secondary mt-2">Browse the skill marketplace or use the search bar to find mentors in the skill you're interested in. On the mentor's profile or session listing, you'll find an option to book a session. You can choose the session type (paid or barter) and preferred time.</p>
+          </div>
+          <div class="faq-item">
+            <h4 class="text-xl font-semibold text-primary">How do payments or bartering work?</h4>
+            <p class="text-secondary mt-2">Mentors can set a price for their sessions, or offer sessions for bartering (exchanging skills). Our platform facilitates secure payments for paid sessions. Bartering agreements are handled between the users.</p>
+          </div>
+          <div class="faq-item">
+            <h4 class="text-xl font-semibold text-primary">Is there a mobile app?</h4>
+            <p class="text-secondary mt-2">Currently, LearnX is a web-based platform. We are exploring options for a mobile application in the future.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Support Section -->
+      <div class="card bg-surface-1 p-6 rounded-xl shadow-lg" data-aos="fade-up">
+        <h3 class="text-2xl font-semibold mb-4">Contact Support</h3>
+        <p class="text-secondary mb-4">If you have any questions, issues, or feedback, please feel free to reach out to our support team.</p>
+        <p class="text-secondary">Email: <a href="mailto:support@learnx.com" class="text-primary hover:underline">support@learnx.com</a></p>
+        <p class="text-secondary mt-2">For urgent matters, you can also use the chat feature within the platform (if available).</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-notification">
+    <div class="flex items-center">
+      <i class="fas fa-info-circle text-primary text-xl mr-3"></i>
+      <div>
+        <h4 class="font-medium">Information</h4>
+        <p class="text-sm text-secondary" id="toast-message">This is a notification.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AOS Animation Init -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="js/sidebar-loader.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+  </script>
+  <script>
+    particlesJS('particles-js', {
+        "particles": {
+            "number": {
+                "value": 80,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": "#00bfa6"
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                }
+            },
+            "opacity": {
+                "value": 0.3,
+                "random": false
+            },
+            "size": {
+                "value": 3,
+                "random": true
+            },
+            "line_linked": {
+                "enable": true,
+                "distance": 150,
+                "color": "#00bfa6",
+                "opacity": 0.4,
+                "width": 1
+            },
+            "move": {
+                "enable": true,
+                "speed": 6,
+                "direction": "none",
+                "random": false,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false
+            }
+        }
+    });
+  </script>
+</body>
+</html>

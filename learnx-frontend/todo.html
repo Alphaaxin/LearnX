@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List - LearnX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #1E201E, #3C3D37, #697565);
+    }
+    .gradient-bg {
+      background: linear-gradient(135deg, #1E201E, #3C3D37, #697565);
+    }
+    .content-area {
+      flex: 1;
+      padding-bottom: 4rem; /* Add padding to the bottom */
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head> 
+  <div id="particles-js" class="absolute top-0 left-0 w-full h-full z-10 opacity-30 pointer-events-none"></div>
+<body class="gradient-bg gradient-bg text-white font-sans">
+
+  <!-- Flex container for sidebar and content -->
+  <div class="flex">
+    <!-- Sidebar Placeholder - will be replaced by sidebar-loader.js -->
+    <div class="sidebar-placeholder"></div>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 ml-64 p-8 content-area">
+      <h2 class="text-3xl md:text-4xl font-semibold mb-6" data-aos="fade-up">Your Task Planner</h2>
+
+      <!-- Add New Task Form -->
+      <div class="card bg-surface-1 p-6 rounded-xl shadow-lg mb-8" data-aos="fade-up">
+        <h3 class="text-2xl font-semibold mb-4">Add New Task</h3>
+        <form id="addTaskForm" class="space-y-4">
+          <div>
+            <label for="taskTitle" class="block text-lg mb-2">Task Title</label>
+            <input type="text" id="taskTitle" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g., Complete Python tutorial module 3" required>
+          </div>
+          <div>
+            <label for="taskType" class="block text-lg mb-2">Task Type</label>
+            <select id="taskType" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
+              <option value="learning">Learning Task</option>
+              <option value="teaching">Teaching Commitment</option>
+            </select>
+          </div>
+          <div>
+            <label for="taskDueDate" class="block text-lg mb-2">Due Date (Optional)</label>
+            <input type="date" id="taskDueDate" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+          </div>
+          <div>
+            <label for="taskPriority" class="block text-lg mb-2">Priority</label>
+            <select id="taskPriority" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div>
+            <label for="taskSessionLink" class="block text-lg mb-2">Link to Session (Optional)</label>
+            <input type="text" id="taskSessionLink" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Paste session link here">
+          </div>
+          <button type="submit" class="btn btn-primary py-3 px-6 rounded-lg">Add Task</button>
+        </form>
+      </div>
+ 
+      <!-- Task List -->
+      <div class="card bg-surface-1 p-6 rounded-xl shadow-lg" data-aos="fade-up">
+        <h3 class="text-2xl font-semibold mb-4">Your Tasks</h3>
+        <ul id="todo-list" class="space-y-4">
+          <!-- Task items will be added here by JavaScript -->
+          <li class="bg-surface-2 p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center transition-transform transform hover:scale-[1.01]">
+            <div>
+              <h4 class="text-xl font-semibold">Example Learning Task <span class="text-xs text-secondary ml-2">Progress: 50%</span></h4>
+              <p class="text-secondary text-sm">Type: Learning | Priority: Medium | Due: 2023-12-31</p>
+              <p class="text-sm text-primary mt-1">Session: <a href="#" class="hover:underline">Link to Session</a></p>
+              <div class="progress-bar w-full h-2.5 mt-2"><div class="progress-bar-fill" style="width: 50%"></div></div>
+            </div>
+            <div class="flex space-x-2 mt-4 md:mt-0">
+              <button class="text-primary hover:underline transition-colors">Update Progress</button>
+              <button class="text-error hover:underline transition-colors">Delete</button>
+            </div>
+          </li>
+ 
+          <li class="bg-surface-2 p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center transition-transform transform hover:scale-[1.01]">
+            <div>
+              <h4 class="text-xl font-semibold">Example Teaching Commitment</h4>
+              <p class="text-secondary text-sm">Type: Teaching | Priority: High | Due: 2024-01-15</p>
+              <p class="text-sm text-primary mt-2">Progress: 80%</p>
+              <div class="progress-bar w-full h-2.5 mt-2">
+                <div class="progress-bar-fill" style="width: 80%;"></div>
+              </div>
+            </div>
+            <div class="flex space-x-2">
+              <button class="text-primary hover:underline">Mark Complete</button>
+              <button class="text-error hover:underline">Archive</button>
+              <button class="text-error hover:underline transition-colors">Delete</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-notification">
+    <div class="flex items-center">
+      <i class="fas fa-info-circle text-primary text-xl mr-3"></i>
+      <div>
+        <h4 class="font-medium">Information</h4>
+        <p class="text-sm text-secondary" id="toast-message">This is a notification.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AOS Animation Init -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="js/sidebar-loader.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+
+    // Basic JavaScript for adding tasks (client-side only)
+    document.getElementById('addTaskForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const taskTitle = document.getElementById('taskTitle').value;
+      const taskType = document.getElementById('taskType').value;
+      const taskDueDate = document.getElementById('taskDueDate').value;
+      const taskPriority = document.getElementById('taskPriority').value;
+      const taskSessionLink = document.getElementById('taskSessionLink').value;
+
+      const taskList = document.getElementById('todo-list');
+      const newTaskItem = document.createElement('li');
+      newTaskItem.classList.add('bg-surface-2', 'p-4', 'rounded-lg', 'flex', 'justify-between', 'items-center');
+
+      newTaskItem.innerHTML = `
+        <div>
+          <h4 class="text-xl font-semibold">${taskTitle} <span class="text-xs text-secondary ml-2">Progress: 0%</span></h4>
+          <p class="text-secondary text-sm">Type: ${taskType.charAt(0).toUpperCase() + taskType.slice(1)} | Priority: ${taskPriority.charAt(0).toUpperCase() + taskPriority.slice(1)}${taskDueDate ? ' | Due: ' + taskDueDate : ''}</p>
+          ${taskSessionLink ? `<p class="text-sm text-primary mt-1">Session: <a href="${taskSessionLink}" target="_blank" class="hover:underline">Link to Session</a></p>` : ''}
+          <div class="progress-bar w-full mt-2"><div class="progress-bar-fill" style="width: 0%"></div></div>
+        </div>
+        <div class="flex space-x-2">
+          ${taskType === 'learning' ? '<button class="text-primary hover:underline">Update Progress</button>' : ''}
+          ${taskType === 'teaching' ? '<button class="text-primary hover:underline">Mark Complete</button>' : ''}
+          <button class="text-error hover:underline">Delete</button>
+        </div>
+      `;
+
+      // Basic functionality for updating progress and deleting (client-side example)
+
+      taskList.appendChild(newTaskItem);
+
+      // Clear form
+      document.getElementById('taskTitle').value = '';
+      document.getElementById('taskDueDate').value = '';
+      
+      // Show toast notification
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = 'Task added successfully!';
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    });
+
+    // Placeholder for fetching user to-do data from the backend
+    async function fetchTodoData(userId) {
+      // In a real application, you would make an API call here,
+      // e.g., using fetch or a library like Axios:
+      // const response = await fetch(`/api/users/${userId}/todos`);
+      // const data = await response.json();
+      // return data.todos;
+
+      // Simulate fetching data
+      console.log(`Fetching to-do data for user ${userId}...`);
+      return []; // Return an empty array for now
+    }
+
+    // Function to display to-do data
+    function displayTodoData(todoItems) {
+      const todoList = document.getElementById('todo-list');
+      // Clear existing placeholder items if needed
+      // todoList.innerHTML = '';
+
+      // Loop through todoItems and create list items to display them
+      // Example: todoItems.forEach(item => { ... create list item ... });
+    }
+
+    // Call the fetch function when the page loads (with a placeholder user ID)
+    document.addEventListener('DOMContentLoaded', async () => {
+      const placeholderUserId = '123'; // Replace with actual user ID retrieval logic
+    });
+  </script>
+  <script>
+    particlesJS('particles-js', {
+        "particles": {
+            "number": {
+                "value": 80,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": "#00bfa6"
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                }
+            },
+            "opacity": {
+                "value": 0.3,
+                "random": false
+            },
+            "size": {
+                "value": 3,
+                "random": true
+            },
+            "line_linked": {
+                "enable": true,
+                "distance": 150,
+                "color": "#00bfa6",
+                "opacity": 0.4,
+                "width": 1
+            },
+            "move": {
+                "enable": true,
+                "speed": 6,
+                "direction": "none",
+                "random": false,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false
+            }
+        }
+    });
+  </script>
+</body>
+</html>

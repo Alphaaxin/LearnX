@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Profile - LearnX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+  <div id="particles-js" class="absolute top-0 left-0 w-full h-full z-10 opacity-30 pointer-events-none"></div>
+<body class="gradient-bg gradient-bg text-white font-sans">
+ 
+  <!-- Flex container for sidebar and content -->
+  <div class="flex">
+    <!-- Sidebar Placeholder - will be replaced by sidebar-loader.js -->
+    <div class="sidebar-placeholder"></div>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-64 p-8">
+      <div id="loading" class="text-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
+        <p class="mt-4 text-lg">Loading teacher profile...</p>
+      </div>
+      
+      <div id="profile-content" class="hidden">
+        <!-- Teacher Profile Header -->
+        <div class="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-6 mb-8" data-aos="fade-up">
+          <div class="w-24 h-24 rounded-full bg-surface-3 overflow-hidden border-2 border-primary">
+            <img id="teacher-image" src="https://placehold.co/150x150" alt="Teacher" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <h2 id="teacher-name" class="text-3xl md:text-4xl font-semibold"></h2>
+            <div class="flex items-center mt-2">
+              <span id="teacher-rating" class="text-warning text-xl mr-2"></span>
+              <span id="review-count" class="text-secondary"></span>
+            </div>
+            <p id="teacher-title" class="text-primary text-xl mt-1"></p>
+          </div>
+        </div>
+
+        <!-- Teacher Details -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <!-- About -->
+          <div class="col-span-2 card bg-surface-1 p-6 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="100">
+            <h3 class="text-2xl font-semibold mb-4">About</h3>
+            <p id="teacher-description" class="text-secondary"></p>
+            
+            <div class="mt-4 grid grid-cols-2 gap-4">
+              <div>
+                <h4 class="text-lg font-semibold">Experience</h4>
+                <p id="teacher-experience" class="text-secondary"></p>
+              </div>
+              <div>
+                <h4 class="text-lg font-semibold">Hourly Rate</h4>
+                <p id="teacher-rate" class="text-secondary"></p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Stats -->
+          <div class="card bg-surface-1 p-6 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="200">
+            <h3 class="text-2xl font-semibold mb-4">Stats</h3>
+            <div class="space-y-4">
+              <div>
+                <h4 class="text-lg font-semibold">Sessions Completed</h4>
+                <p id="sessions-completed" class="text-secondary">0</p>
+              </div>
+              <div>
+                <h4 class="text-lg font-semibold">Students Taught</h4>
+                <p id="students-taught" class="text-secondary">0</p>
+              </div>
+              <div>
+                <h4 class="text-lg font-semibold">Response Rate</h4>
+                <p class="text-secondary">95%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Available Sessions -->
+        <div id="available-sessions-container" class="mb-8 hidden">
+          <h3 class="text-2xl font-semibold mb-4" data-aos="fade-up">Available Sessions</h3>
+          <div id="available-sessions" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-aos="fade-up" data-aos-delay="100">
+            <!-- Sessions will be populated here by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Reviews -->
+        <div id="reviews-container">
+          <h3 class="text-2xl font-semibold mb-4" data-aos="fade-up">Reviews</h3>
+          <div id="reviews-loading" class="text-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mx-auto"></div>
+            <p class="mt-2">Loading reviews...</p>
+          </div>
+          <div id="reviews-list" class="space-y-4 hidden" data-aos="fade-up" data-aos-delay="100">
+            <!-- Reviews will be populated here by JavaScript -->
+          </div>
+          <div id="no-reviews" class="card bg-surface-1 p-6 rounded-xl text-center hidden" data-aos="fade-up" data-aos-delay="100">
+            <p class="text-secondary">No reviews yet.</p>
+            <p class="mt-2">Be the first to leave a review after taking a session!</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Error Message -->
+      <div id="error-container" class="hidden bg-error text-white p-6 rounded-xl">
+        <p id="error-message">An error occurred while loading the teacher profile.</p>
+        <button onclick="window.location.href='learn.html'" class="mt-4 bg-white text-error py-2 px-4 rounded-lg">
+          Return to Learn Page
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-notification">
+    <div class="flex items-center">
+      <i class="fas fa-info-circle text-primary text-xl mr-3"></i>
+      <div>
+        <h4 class="font-medium">Information</h4>
+        <p class="text-sm text-secondary" id="toast-message">This is a notification.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AOS Animation Init -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="js/sidebar-loader.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Get teacher ID from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const teacherId = urlParams.get('id');
+      
+      if (!teacherId) {
+        showError("No teacher specified. Please go back and try again.");
+        return;
+      }
+      
+      // Fetch teacher profile and reviews
+      fetchTeacherProfile(teacherId);
+      fetchTeacherReviews(teacherId);
+    });
+    
+    async function fetchTeacherProfile(teacherId) {
+      try {
+        const response = await fetch(`http://localhost:5000/api/teach/${teacherId}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch teacher profile: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log("Teacher profile data:", data);
+        
+        // Populate profile data
+        document.getElementById('teacher-name').textContent = data.username;
+        document.getElementById('teacher-title').textContent = data.profile.title || 'Teacher at LearnX';
+        document.getElementById('teacher-description').textContent = data.profile.description || 'No bio available. This teacher has not added a description yet.';
+        document.getElementById('teacher-experience').textContent = `${data.profile.experience_years || '1+'} years`;
+        document.getElementById('teacher-rate').textContent = `$${data.profile.hourly_rate || '45'}/hr`;
+        document.getElementById('sessions-completed').textContent = data.profile.sessions_completed || 0;
+        document.getElementById('students-taught').textContent = data.profile.students_taught || 0;
+        
+        // Display rating with stars
+        const rating = data.profile.rating || 0;
+        document.getElementById('teacher-rating').textContent = rating > 0 ? '★'.repeat(Math.round(rating)) : 'No ratings yet';
+        document.getElementById('review-count').textContent = `(${data.profile.reviews || 0} reviews)`;
+        
+        // Set profile image
+        if (data.profile_picture_url) {
+          document.getElementById('teacher-image').src = data.profile_picture_url;
+        } else {
+          // Generate avatar from name
+          document.getElementById('teacher-image').src = "https://ui-avatars.com/api/?name=" + 
+            encodeURIComponent(data.username.replace(' ', '+')) + 
+            "&background=00BFA6&color=fff&size=128";
+        }
+        
+        // Check if teacher has sessions
+        if (data.sessions && data.sessions.length > 0) {
+          document.getElementById('available-sessions-container').classList.remove('hidden');
+          displaySessions(data.sessions, teacherId);
+        }
+        
+        // Find the About section
+        const aboutSection = document.querySelector('.col-span-2.card');
+        
+        // Display skills if available
+        if (data.skills && data.skills.length > 0) {
+          const skillsHtml = `
+            <div class="mt-6">
+              <h4 class="text-lg font-semibold">Skills</h4>
+              <div class="flex flex-wrap gap-2 mt-2">
+                ${data.skills.map(skill => `<span class="bg-primary bg-opacity-20 text-primary py-1 px-3 rounded-full text-sm">${skill}</span>`).join('')}
+              </div>
+            </div>
+          `;
+          aboutSection.insertAdjacentHTML('beforeend', skillsHtml);
+        }
+        
+        // Display education if available
+        if (data.education && data.education.length > 0) {
+          const educationHtml = `
+            <div class="mt-6">
+              <h4 class="text-lg font-semibold">Education</h4>
+              <div class="mt-2">
+                ${data.education.map(edu => `
+                  <div class="mb-2">
+                    <p class="font-medium">${edu.degree || 'Degree'}</p>
+                    <p class="text-secondary text-sm">${edu.institution || 'Institution'}, ${edu.year || ''}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+          aboutSection.insertAdjacentHTML('beforeend', educationHtml);
+        }
+        
+        // Display languages if available
+        if (data.languages && data.languages.length > 0) {
+          const languagesHtml = `
+            <div class="mt-6">
+              <h4 class="text-lg font-semibold">Languages</h4>
+              <div class="flex flex-wrap gap-2 mt-2">
+                ${data.languages.map(lang => `<span class="bg-surface-3 py-1 px-3 rounded-full text-sm">${lang}</span>`).join('')}
+              </div>
+            </div>
+          `;
+          aboutSection.insertAdjacentHTML('beforeend', languagesHtml);
+        }
+        
+        // Add website link if available
+        if (data.website) {
+          const websiteHtml = `
+            <div class="mt-6">
+              <h4 class="text-lg font-semibold">Website</h4>
+              <a href="${data.website}" target="_blank" class="text-primary hover:underline flex items-center mt-1">
+                <i class="fas fa-external-link-alt mr-2"></i> ${data.website}
+              </a>
+            </div>
+          `;
+          aboutSection.insertAdjacentHTML('beforeend', websiteHtml);
+        }
+        
+        // Show profile content
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('profile-content').classList.remove('hidden');
+        
+      } catch (error) {
+        console.error("Error fetching teacher profile:", error);
+        showError(error.message);
+      }
+    }
+    
+    async function fetchTeacherReviews(teacherId) {
+      try {
+        const response = await fetch(`http://localhost:5000/api/teach/${teacherId}/reviews`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch teacher reviews: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log("Teacher reviews data:", data);
+        
+        // Hide loading
+        document.getElementById('reviews-loading').classList.add('hidden');
+        
+        if (data.reviews && data.reviews.length > 0) {
+          displayReviews(data.reviews);
+        } else {
+          document.getElementById('no-reviews').classList.remove('hidden');
+        }
+        
+      } catch (error) {
+        console.error("Error fetching teacher reviews:", error);
+        document.getElementById('reviews-loading').classList.add('hidden');
+        document.getElementById('no-reviews').classList.remove('hidden');
+      }
+    }
+    
+    function displaySessions(sessions, teacherId) {
+      const container = document.getElementById('available-sessions');
+      container.innerHTML = ''; // Clear container
+      
+      sessions.forEach(session => {
+        const sessionCard = document.createElement('div');
+        sessionCard.className = 'card bg-surface-1 p-6 rounded-xl shadow-lg card-hover';
+        
+        const date = new Date(session.datetime);
+        const formattedDate = date.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
+        
+        const formattedTime = date.toLocaleTimeString('en-US', { 
+          hour: '2-digit', 
+          minute: '2-digit'
+        });
+        
+        sessionCard.innerHTML = `
+          <h4 class="text-xl font-semibold mb-2">${session.title}</h4>
+          <p class="text-secondary mb-4">${session.description.substring(0, 100)}${session.description.length > 100 ? '...' : ''}</p>
+          <div class="flex justify-between items-center text-sm text-secondary mb-4">
+            <span><i class="fas fa-calendar mr-1"></i> ${formattedDate}</span>
+            <span><i class="fas fa-clock mr-1"></i> ${formattedTime}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-primary font-semibold">$${session.price}</span>
+            <a href="book-session.html?session=${session.id}&teacher=${teacherId}" class="btn btn-primary py-2 px-4 rounded-lg">Book Now</a>
+          </div>
+        `;
+        
+        container.appendChild(sessionCard);
+      });
+    }
+    
+    function displayReviews(reviews) {
+      const container = document.getElementById('reviews-list');
+      container.innerHTML = ''; // Clear container
+      container.classList.remove('hidden');
+      
+      reviews.forEach(review => {
+        const reviewCard = document.createElement('div');
+        reviewCard.className = 'testimonial-card';
+        
+        // Format date as "Month Day, Year"
+        const date = new Date(review.created_at);
+        const formattedDate = date.toLocaleDateString('en-US', { 
+          month: 'long', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
+        
+        reviewCard.innerHTML = `
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <div class="text-warning">${'★'.repeat(review.rating)}</div>
+              <p class="font-semibold mt-1">${review.student_name}</p>
+            </div>
+            <span class="text-secondary text-sm">${formattedDate}</span>
+          </div>
+          <p class="text-secondary">${review.comment}</p>
+          ${review.session_title ? `<p class="text-xs text-primary mt-2">Session: ${review.session_title}</p>` : ''}
+        `;
+        
+        container.appendChild(reviewCard);
+      });
+    }
+    
+    function showError(message) {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('profile-content').classList.add('hidden');
+      
+      const errorContainer = document.getElementById('error-container');
+      errorContainer.classList.remove('hidden');
+      
+      document.getElementById('error-message').textContent = message;
+    }
+    
+    // Toast notification function
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+  <script>
+    particlesJS('particles-js', {
+        "particles": {
+            "number": {
+                "value": 80,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": "#00bfa6"
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                }
+            },
+            "opacity": {
+                "value": 0.3,
+                "random": false
+            },
+            "size": {
+                "value": 3,
+                "random": true
+            },
+            "line_linked": {
+                "enable": true,
+                "distance": 150,
+                "color": "#00bfa6",
+                "opacity": 0.4,
+                "width": 1
+            },
+            "move": {
+                "enable": true,
+                "speed": 6,
+                "direction": "none",
+                "random": false,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false
+            }
+        }
+    });
+  </script>
+</body>
+</html> 

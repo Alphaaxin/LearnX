@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Session - LearnX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+  <div id="particles-js" class="absolute top-0 left-0 w-full h-full z-10 opacity-30 pointer-events-none"></div>
+<body class="gradient-bg gradient-bg text-white font-sans">
+  <!-- Flex container for sidebar and content -->
+  <div class="flex">
+    <!-- Sidebar Placeholder - will be replaced by sidebar-loader.js -->
+    <div class="sidebar-placeholder"></div>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-64 p-8">
+      <h2 class="text-3xl md:text-4xl font-semibold mb-8" data-aos="fade-up">Book a Session</h2>
+
+      <!-- User Balance Display -->
+      <div class="text-xl font-semibold mb-4" data-aos="fade-up">
+        Available Balance: <span id="user-balance" class="text-primary">Loading...</span>
+      </div>
+
+      <!-- Booking Form -->
+      <div class="max-w-lg mx-auto card bg-surface-1 p-8 rounded-xl shadow-lg card-hover" data-aos="fade-up" data-aos-delay="200">
+        <form action="#" method="POST" class="space-y-6">
+          <div>
+            <label for="skill" class="block text-lg font-semibold mb-2">Select Skill</label>
+            <select id="skill" name="skill" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+              <option value="">-- Choose a skill --</option>
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="uidesign">UI/UX Design</option>
+              <option value="graphicdesign">Graphic Design</option>
+              <option value="music theory">Music Theory</option>
+              <option value="fitness">Fitness</option>
+              <option value="business">Business</option>
+              <option value="language">Language</option>
+              <option value="others">Others</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-lg font-semibold mb-2">Session Mode</label>
+            <div class="flex items-center space-x-6">
+              <label class="inline-flex items-center cursor-pointer">
+                <input type="radio" name="mode" value="paid" class="form-radio text-primary" checked>
+                <span class="ml-2">Paid</span>
+              </label>
+              <label class="inline-flex items-center cursor-pointer">
+                <input type="radio" name="mode" value="barter" class="form-radio text-primary">
+                <span class="ml-2">Barter</span>
+              </label> 
+            </div>
+          </div>
+
+          <div>
+            <label for="user-name" class="block text-lg font-semibold mb-2">Your Name</label>
+            <input type="text" id="user-name" name="name" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter your name">
+          </div>
+
+          <div>
+            <label for="user-email" class="block text-lg font-semibold mb-2">Your Email</label>
+            <input type="email" id="user-email" name="email" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter your email">
+          </div>
+
+          <div>
+            <label for="duration" class="block text-lg font-semibold mb-2">Session Duration (minutes)</label>
+            <input type="number" id="duration" name="duration" min="15" step="15" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g., 60">
+          </div>
+
+          <button type="submit" class="btn btn-primary w-full py-3 rounded-full text-white font-semibold text-lg mt-4">
+            Find Mentors
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-notification">
+    <div class="flex items-center">
+      <i class="fas fa-info-circle text-primary text-xl mr-3"></i>
+      <div>
+        <h4 class="font-medium">Information</h4>
+        <p class="text-sm text-secondary" id="toast-message">This is a notification.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AOS Animation Init -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="js/sidebar-loader.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Placeholder user ID - replace with actual user ID retrieval logic
+      const userId = localStorage.getItem('user_id') || 'placeholder_user_id';
+
+      if (userId) {
+        fetchUserDataForBooking(userId);
+      } else {
+        // Handle case where user is not logged in, e.g., redirect to login
+        console.log('User not logged in. Cannot fetch booking data.');
+        // Show toast notification
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-message').textContent = 'Please log in to book a session.';
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
+      
+      // Add form submission handler
+      document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // Show toast notification
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-message').textContent = 'Searching for mentors...';
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+          window.location.href = 'marketplace.html?skill=' + document.getElementById('skill').value;
+        }, 2000);
+      });
+    });
+
+    // Placeholder function to simulate fetching user data for booking
+    async function fetchUserDataForBooking(userId) {
+      // TODO: Replace with actual backend API call to fetch user balance, name, and email
+      console.log(`Fetching user data for booking for user ID: ${userId}`);
+      // Example of dummy data
+      const dummyUserData = {
+        balance: 150.75,
+        name: 'Jane Doe',
+        email: 'jane.doe@example.com'
+      };
+      displayBookingUserData(dummyUserData);
+    }
+
+    // Function to display user data on the booking page
+    function displayBookingUserData(userData) {
+      // Populate user balance
+      const balanceElement = document.getElementById('user-balance');
+      if (balanceElement && userData.balance !== undefined) {
+        balanceElement.textContent = `$${userData.balance.toFixed(2)}`;
+      }
+
+      // Pre-fill name and email fields
+      const nameInput = document.getElementById('user-name');
+      if (nameInput && userData.name) {
+        nameInput.value = userData.name;
+      }
+
+      const emailInput = document.getElementById('user-email');
+      if (emailInput && userData.email) {
+        emailInput.value = userData.email;
+      }
+    }
+  </script>
+  <script>
+    particlesJS('particles-js', {
+        "particles": {
+            "number": {
+                "value": 80,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": "#00bfa6"
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                }
+            },
+            "opacity": {
+                "value": 0.3,
+                "random": false
+            },
+            "size": {
+                "value": 3,
+                "random": true
+            },
+            "line_linked": {
+                "enable": true,
+                "distance": 150,
+                "color": "#00bfa6",
+                "opacity": 0.4,
+                "width": 1
+            },
+            "move": {
+                "enable": true,
+                "speed": 6,
+                "direction": "none",
+                "random": false,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false
+            }
+        }
+    });
+  </script>
+</body>
+</html>

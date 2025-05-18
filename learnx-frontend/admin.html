@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - LearnX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+  <div id="particles-js" class="absolute top-0 left-0 w-full h-full z-10 opacity-30 pointer-events-none"></div>
+<body class="gradient-bg gradient-bg text-white font-sans">
+
+  <!-- Flex container for sidebar and content -->
+  <div class="flex">
+    <!-- Sidebar Placeholder - will be replaced by sidebar-loader.js -->
+    <div class="sidebar-placeholder"></div>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-64 p-8">
+      <h2 class="text-3xl md:text-4xl font-semibold mb-6" data-aos="fade-up">Admin Panel</h2>
+      
+      <!-- User Management -->
+      <div class="card bg-surface-1 p-6 rounded-xl shadow-lg mb-8 card-hover" data-aos="fade-up">
+        <h3 class="text-2xl font-semibold mb-4">User Management</h3>
+        <p class="text-secondary">Manage user accounts, roles, and permissions.</p>
+        <div id="user-list" class="overflow-auto mt-4 bg-surface-3 p-4 rounded-lg">
+          <!-- User list will be populated here by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Session Management -->
+      <div class="card bg-surface-1 p-6 rounded-xl shadow-lg mb-8 card-hover" data-aos="fade-up">
+        <h3 class="text-2xl font-semibold mb-4">Session Management</h3>
+        <p class="text-secondary">Monitor and manage ongoing and scheduled sessions.</p>
+        <div class="overflow-auto mt-4 bg-surface-3 p-4 rounded-lg">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="text-primary border-b border-gray-600">
+                <th class="py-2">Session ID</th>
+                <th>Instructor</th>
+                <th>Student</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="hover:bg-surface-2 transition-colors">
+                <td class="py-2">#A23Z</td>
+                <td>sohail1209</td>
+                <td>learner001</td>
+                <td>2025-05-10</td>
+                <td>Scheduled</td>
+                <td>
+                  <button class="px-2 py-1 bg-error rounded hover:bg-opacity-80 text-sm transition-all">Cancel</button>
+                </td>
+              </tr>
+              <!-- More rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Content Management -->
+      <div class="card bg-surface-1 p-6 rounded-xl shadow-lg mb-8 card-hover" data-aos="fade-up">
+        <h3 class="text-2xl font-semibold mb-4">Content Management</h3>
+        <p class="text-secondary">Manage platform content like skill categories, listings, and articles.</p>
+        <div class="mt-4 bg-surface-3 p-4 rounded-lg">
+          <form class="space-y-4">
+            <input type="text" placeholder="New Skill Category" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
+            <button type="submit" class="btn btn-primary px-4 py-2 rounded-lg">Add Category</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Analytics and Moderation -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="card bg-surface-1 p-6 rounded-xl shadow-lg card-hover" data-aos="fade-up">
+          <h3 class="text-xl font-semibold mb-4">Basic Analytics</h3>
+          <p class="text-secondary">View key platform metrics and insights.</p>
+          <div class="mt-4 bg-surface-3 p-4 rounded-lg text-sm text-secondary text-center">
+            📊 Placeholder for charts (e.g., active users, popular skills)
+          </div>
+        </div>
+        <div class="card bg-surface-1 p-6 rounded-xl shadow-lg card-hover" data-aos="fade-up">
+          <h3 class="text-xl font-semibold mb-4">Moderation Tools</h3>
+          <p class="text-secondary">Tools for reviewing reports and taking action.</p>
+          <div class="mt-4 bg-surface-3 p-4 rounded-lg">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm">Reported: "Inappropriate language in session"</span>
+              <div class="space-x-2">
+                <button class="px-2 py-1 bg-warning rounded hover:bg-opacity-80 text-sm transition-all">Warn</button>
+                <button class="px-2 py-1 bg-error rounded hover:bg-opacity-80 text-sm transition-all">Ban</button>
+              </div>
+            </div>
+            <!-- More reports -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-notification">
+    <div class="flex items-center">
+      <i class="fas fa-info-circle text-primary text-xl mr-3"></i>
+      <div>
+        <h4 class="font-medium">Information</h4>
+        <p class="text-sm text-secondary" id="toast-message">This is a notification.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AOS Animation Init -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="js/sidebar-loader.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+  </script>
+  <script>
+    // Function to simulate fetching all users (replace with backend API call)
+    async function fetchAllUsers() {
+      try {
+        // TODO: Replace with actual API call to fetch all users from your backend
+        // const response = await fetch('/api/users');
+        // const data = await response.json();
+
+        // Placeholder data for demonstration
+        const placeholderUsers = [
+          { id: 1, username: 'sohail1209', email: 'sohail@example.com', role: 'Teacher', status: 'Active' },
+          { id: 2, username: 'learner001', email: 'learner1@example.com', role: 'Student', status: 'Active' },
+          { id: 3, username: 'admin_user', email: 'admin@example.com', role: 'Admin', status: 'Active' },
+        ];
+
+        displayUsers(placeholderUsers);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        // Handle error (e.g., display an error message)
+      }
+    }
+
+    // Function to display users in the HTML
+    function displayUsers(users) {
+      const userListContainer = document.getElementById('user-list');
+      userListContainer.innerHTML = ''; // Clear existing content
+
+      // Create a table for better organization
+      const table = document.createElement('table');
+      table.className = 'w-full text-left';
+      
+      // Create table header
+      const thead = document.createElement('thead');
+      thead.innerHTML = `
+        <tr class="text-primary border-b border-gray-600">
+          <th class="py-2">ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+      
+      // Create table body
+      const tbody = document.createElement('tbody');
+      users.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-surface-2 transition-colors';
+        tr.innerHTML = `
+          <td class="py-2">${user.id}</td>
+          <td>${user.username}</td>
+          <td>${user.email}</td>
+          <td>${user.role}</td>
+          <td>${user.status}</td>
+          <td>
+            <button class="px-2 py-1 bg-primary rounded hover:bg-opacity-80 text-sm transition-all">Edit</button>
+            <button class="px-2 py-1 bg-error rounded hover:bg-opacity-80 text-sm transition-all">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      
+      userListContainer.appendChild(table);
+    }
+
+    // Fetch users when the page loads
+    document.addEventListener('DOMContentLoaded', fetchAllUsers);
+  </script>
+  <script>
+    particlesJS('particles-js', {
+        "particles": {
+            "number": {
+                "value": 80,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": "#00bfa6"
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                }
+            },
+            "opacity": {
+                "value": 0.3,
+                "random": false
+            },
+            "size": {
+                "value": 3,
+                "random": true
+            },
+            "line_linked": {
+                "enable": true,
+                "distance": 150,
+                "color": "#00bfa6",
+                "opacity": 0.4,
+                "width": 1
+            },
+            "move": {
+                "enable": true,
+                "speed": 6,
+                "direction": "none",
+                "random": false,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false
+            }
+        }
+    });
+  </script>
+</body>
+</html>

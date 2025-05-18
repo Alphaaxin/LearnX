@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wallet - LearnX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #1E201E, #3C3D37, #697565);
+    }
+    .gradient-bg {
+      background: linear-gradient(135deg, #1E201E, #3C3D37, #697565);
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+  <div id="particles-js" class="absolute top-0 left-0 w-full h-full z-10 opacity-30 pointer-events-none"></div>
+<body class="gradient-bg text-white font-sans">
+  <!-- Flex container for sidebar and content -->
+  <div class="flex">
+    <!-- Sidebar Placeholder - will be replaced by sidebar-loader.js -->
+    <div class="sidebar-placeholder"></div>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-64 p-8">
+      <h2 class="text-3xl md:text-4xl font-semibold mb-6" data-aos="fade-down">Your Wallet</h2>
+
+      <!-- Wallet Summary -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="card bg-surface-1 p-6 rounded-xl shadow-lg text-center transition-all duration-300 ease-in-out transform hover:scale-105" data-aos="fade-up">
+          <h3 class="text-xl font-semibold">Earnings</h3>
+          <p class="mt-2 text-3xl text-primary" id="wallet-earnings">$0.00</p>
+        </div>
+        <div class="card bg-surface-1 p-6 rounded-xl shadow-lg text-center transition-all duration-300 ease-in-out transform hover:scale-105" data-aos="fade-up" data-aos-delay="100">
+          <h3 class="text-xl font-semibold">Points</h3>
+          <p class="mt-2 text-3xl text-primary" id="wallet-points">0</p>
+        </div>
+        <div class="card bg-surface-1 p-6 rounded-xl shadow-lg text-center transition-all duration-300 ease-in-out transform hover:scale-105" data-aos="fade-up" data-aos-delay="200">
+          <h3 class="text-xl font-semibold">Available Funds</h3>
+          <p class="mt-2 text-3xl text-primary" id="wallet-balance">$0.00</p>
+        </div>
+      </div>
+
+      <!-- Transaction History -->
+      <div class="card bg-surface-1 p-6 rounded-xl shadow-lg mb-8 overflow-x-auto" data-aos="fade-up" data-aos-delay="300">
+        <h3 class="text-2xl font-semibold mb-4">Transaction History</h3>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-surface-3">
+            <thead>
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider animate-pulse">Date</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider animate-pulse">Description</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider animate-pulse">Amount</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider animate-pulse">Type</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-3">
+              <!-- Transaction history will be populated here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Payment Gateway Integration Placeholder -->
+      <div class="card bg-surface-1 p-6 rounded-xl shadow-lg mb-8" data-aos="fade-up" data-aos-delay="400">
+        <h3 class="text-2xl font-semibold mb-4">Payment Options</h3>
+        <p class="text-secondary mb-4">Connect your payment accounts to easily manage earnings and payments.</p>
+        <div class="flex space-x-4" id="payment-methods">
+          <!-- Payment methods will be populated here -->
+          <!-- Placeholder buttons (remove when integrated) -->
+          <button class="btn btn-primary py-3 px-6 rounded-lg">Connect with Razorpay (Placeholder)</button>
+          <button class="btn btn-primary py-3 px-6 rounded-lg">Connect with Stripe (Placeholder)</button>
+          <!-- End Placeholder buttons -->
+        </div>
+      </div>
+
+      <!-- Withdraw/Redeem Options -->
+      <div class="card bg-surface-1 p-6 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="500">
+        <h3 class="text-2xl font-semibold mb-4">Withdraw / Redeem</h3>
+        <div class="space-y-4">
+          <div>
+            <label for="withdrawAmount" class="block text-lg mb-2">Amount to Withdraw ($):</label>
+            <input type="number" id="withdrawAmount" name="withdrawAmount" class="input-field w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ease-in-out" placeholder="Enter amount">
+          </div>
+          <div class="flex space-x-4">
+            <button class="btn btn-primary py-3 px-6 rounded-lg">Withdraw Funds (Placeholder)</button>
+          </div>
+          <div>
+            <button class="btn btn-primary py-3 px-6 rounded-lg">Redeem Points (Placeholder)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-notification">
+    <div class="flex items-center">
+      <i class="fas fa-info-circle text-primary text-xl mr-3"></i>
+      <div>
+        <h4 class="font-medium">Information</h4>
+        <p class="text-sm text-secondary" id="toast-message">This is a notification.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AOS Animation Init -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="js/sidebar-loader.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+      // Get the user_id from localStorage or wherever you store it
+      const userId = localStorage.getItem('user_id'); // Replace with your actual method
+
+      if (userId) {
+        fetchWalletData(userId);
+      } else {
+        // Handle case where user is not logged in (e.g., redirect to login)
+        console.log('User not logged in');
+        // window.location.href = 'login.html'; // Example redirect
+      }
+    });
+
+    // Placeholder function to fetch user wallet data
+    async function fetchWalletData(userId) {
+      console.log('Fetching wallet data for user:', userId);
+      // *** Integrate with your backend API here ***
+      // Example: const response = await fetch(`/api/wallet/${userId}`);
+      // const data = await response.json();
+      // displayWalletData(data.wallet); // Assuming your backend returns { wallet: { ... } }
+
+      // Simulated data for now
+      const simulatedData = {
+        balance: 750.50,
+        earnings: 600.00,
+        points: 1500,
+        transactionHistory: [], // Add simulated transaction history objects
+        paymentMethods: [] // Add simulated payment method objects
+      };
+      displayWalletData(simulatedData);
+    }
+
+    // Function to display wallet data
+    function displayWalletData(walletData) {
+      // *** Populate the HTML elements with walletData ***
+      document.querySelector('#wallet-balance').textContent = `$${walletData.balance.toFixed(2)}`;
+      document.querySelector('#wallet-earnings').textContent = `$${walletData.earnings.toFixed(2)}`;
+      document.querySelector('#wallet-points').textContent = walletData.points;
+
+      // Example of populating transaction history (you'll need to loop through data.transactionHistory)
+      const transactionTableBody = document.querySelector('#transaction-history tbody');
+      if (transactionTableBody) {
+        transactionTableBody.innerHTML = ''; // Clear existing rows
+        walletData.transactionHistory.forEach(transaction => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap">${transaction.date}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${transaction.description}</td>
+            <td class="px-6 py-4 whitespace-nowrap ${transaction.amount >= 0 ? 'text-success' : 'text-error'}">${transaction.amount >= 0 ? '+' : '-'}$${Math.abs(transaction.amount).toFixed(2)}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${transaction.type}</td>
+          `;
+          transactionTableBody.appendChild(row);
+        });
+      }
+
+      // Example of populating payment methods (you'll need to loop through data.paymentMethods)
+      const paymentMethodsDiv = document.querySelector('#payment-methods');
+      if (paymentMethodsDiv) {
+         // Clear existing content (including placeholder buttons if you keep them)
+         // paymentMethodsDiv.innerHTML = '';
+         walletData.paymentMethods.forEach(method => {
+           const methodElement = document.createElement('div');
+           methodElement.textContent = method.name; // Customize based on your data structure
+           // paymentMethodsDiv.appendChild(methodElement);
+         });
+      }
+    }
+  </script>
+  <script>
+    particlesJS('particles-js', {
+        "particles": {
+            "number": {
+                "value": 80,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": "#00bfa6"
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                }
+            },
+            "opacity": {
+                "value": 0.3,
+                "random": false
+            },
+            "size": {
+                "value": 3,
+                "random": true
+            },
+            "line_linked": {
+                "enable": true,
+                "distance": 150,
+                "color": "#00bfa6",
+                "opacity": 0.4,
+                "width": 1
+            },
+            "move": {
+                "enable": true,
+                "speed": 6,
+                "direction": "none",
+                "random": false,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false
+            }
+        }
+    });
+  </script>
+</body>
+</html>
